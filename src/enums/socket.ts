@@ -1,12 +1,5 @@
 export enum ESocketTargets {
-  Movement = 'movement',
   Chat = 'chat',
-  Authorization = 'authorization',
-}
-
-export enum EMovementSubTargets {
-  Move = 'move',
-  Get = 'get',
 }
 
 export enum EMessageSubTargets {

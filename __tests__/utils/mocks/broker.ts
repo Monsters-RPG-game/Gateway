@@ -1,11 +1,10 @@
 import Broker from '../../../src/connections/broker/index.js';
 import type * as types from '../../../src/types/connection.js';
-import * as enums from '../../../src/enums/connection.js';
-import { EMessageTypes } from '../../../src/enums/connection.js';
+import * as enums from '../../../src/enums/index.js';
 import { IBrokerAction } from '../../types/broker.js';
-import { EUserTypes } from '../../../src/enums/index.js';
-import Log from '../../../src/tools/logger/index.js'
+import Log from 'simpl-loggar'
 import chalk from 'chalk';
+import { IUserBrokerInfo } from '../../../src/types/user.js';
 
 export default class FakeBroker extends Broker {
   private _actions: { action: IBrokerAction, subTarget: types.IRabbitSubTargets }[] = [];
@@ -52,41 +51,40 @@ export default class FakeBroker extends Broker {
     subTarget: T,
     resolve: (
       value:
-        | { type: EMessageTypes.Credentials | EMessageTypes.Send; payload: unknown }
+        | { type: Omit<enums.EMessageTypes, enums.EMessageTypes.Heartbeat>; payload: unknown }
         | PromiseLike<{
-          type: EMessageTypes.Credentials | EMessageTypes.Send;
+          type: Omit<enums.EMessageTypes, enums.EMessageTypes.Heartbeat>;
           payload: unknown;
         }>,
     ) => void,
     reject: (reason?: unknown) => void,
-    _locals: {
-      tempId: string;
-      userId: string | undefined;
-      type: EUserTypes;
-    },
+    _locals: IUserBrokerInfo,
     _service: enums.EServices,
     _payload?: types.IRabbitConnectionData[T],
   ): void {
-    const action = (this.actions.find(a => a.subTarget === subTarget))?.action;
+    const actionIndex = (this.actions.findIndex(a => a.subTarget === subTarget));
+    const action = this.actions[actionIndex]?.action
+
+    Log.debug('Fake broker', `Action for target: ${target} and subTarget: ${subTarget}`, action)
+
+    delete this.actions[actionIndex]
+    this.actions = this.actions.filter(a => a)
 
     if (!action) {
       this.stats.push({ target, subTarget, stack: (new Error()).stack as string, success: false, reason: "No callback provided" })
 
-      this.actions = this.actions.filter(a => a.subTarget !== subTarget);
-      return resolve({ type: EMessageTypes.Send, payload: {} });
+      return resolve({ type: enums.EMessageTypes.Send, payload: {} });
     }
 
     if (action!.shouldFail) {
       this.stats.push({ target, subTarget, stack: (new Error()).stack as string, success: true, reason: "Should fail" })
 
-      this.actions = this.actions.filter(a => a.subTarget !== subTarget);
       reject(action.returns.payload);
     } else {
       this.stats.push({ target, subTarget, stack: (new Error()).stack as string, success: true })
 
-      this.actions = this.actions.filter(a => a.subTarget !== subTarget);
       resolve({
-        type: action.returns.target as EMessageTypes.Credentials | EMessageTypes.Send,
+        type: action.returns.target as Omit<enums.EMessageTypes, enums.EMessageTypes.Heartbeat>,
         payload: action.returns.payload,
       });
     }
@@ -97,6 +95,7 @@ export default class FakeBroker extends Broker {
   }
 
   addAction(action: IBrokerAction, subTarget: types.IRabbitSubTargets): void {
+    Log.debug("Fake broker", 'Adding new action', action, subTarget)
     this.actions.push({ action, subTarget })
   }
 

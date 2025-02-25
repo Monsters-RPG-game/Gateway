@@ -8,6 +8,9 @@ node_modules/
 # Coverage
 coverage
 
+# Transpiled files
+build/
+
 # VS Code
 .vscode
 !.vscode/tasks.js
@@ -18,16 +21,15 @@ coverage
 # Optional npm cache directory
 .npm
 yarn.lock
-package-lock.json
 
 # Optional eslint cache
 .eslintcache
 
+# Typescript cache
+tsconfig.tsbuildinfo
+
 # Misc
 .DS_Store
-dist/
-/dist
-dist
 
 /img/**/*
 img/*
@@ -37,12 +39,6 @@ img/
 /node_modules
 /.pnp
 .pnp.js
-
-# testing
-/coverage
-
-# production
-/build
 
 # misc
 .env.local

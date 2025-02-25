@@ -13,14 +13,14 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: node:22-alpine
+      image: node:22
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: node:18-alpine
+      image: node:18
 
     steps:
       - name: Checkout code
@@ -43,12 +43,12 @@ jobs:
 
       - name: Setup config files
         run: |
-          cp config/exampleConfig.json config/devConfig.json
           cp config/exampleConfig.json config/prodConfig.json
+          cp config/exampleConfig.json config/devConfig.json
           cp config/exampleConfig.json config/testConfig.json
 
       - name: Upload config
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: config
           path: config/
@@ -58,17 +58,14 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: node:18-alpine
+      image: node:18
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -76,30 +73,27 @@ jobs:
             ${{ runner.OS }}-node-
 
       - name: Download config
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: config
           path: config/
 
       - name: Run tests
-        run: yarn test:e2e && yarn test:unit && yarn test:db
+        run: npm install && npm run test:e2e && npm run test:unit && npm run test:db
 
   lint:
     needs: [setup-config]
     runs-on: ubuntu-latest
 
     container:
-      image: node:18-alpine
+      image: node:18
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -107,13 +101,13 @@ jobs:
             ${{ runner.OS }}-node-
 
       - name: Download config
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: config
           path: config/
 
       - name: Lint
-        run: npm run lint
+        run: npm install && npm run lint
 
   build:
     needs: [setup-config, test, lint]
@@ -121,17 +115,14 @@ jobs:
     runs-on: ubuntu-latest
 
     container:
-      image: node:18-alpine
+      image: node:18
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: npm install
-
       - name: Cache node modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -139,10 +130,34 @@ jobs:
             ${{ runner.OS }}-node-
 
       - name: Download config
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: config
           path: config/
 
       - name: Build
-        run: npm run build
+        run: npm install && npm run build
+
+  audit:
+    needs: [test, lint]
+
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    container:
+      image: node:18
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.OS }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.OS }}-node-
+
+      - name: Audit
+        run: npm install && npm audit

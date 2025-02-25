@@ -1,9 +1,8 @@
-export { IProfileEntity } from '../../src/structure/modules/profile/entity';
-export { IAddProfileDto } from '../../src/structure/modules/profile/add/types';
-export { IGetProfileDto } from '../../src/structure/modules/profile/get/types';
-export { ILoginDto } from '../../src/structure/modules/oidc/interaction/types';
-export { IRegisterDto } from '../../src/structure/modules/user/register/types';
-export { IUserDetailsDto } from '../../src/structure/modules/user/details/types';
+export { IProfileEntity } from '../../src/modules/profile/entity';
+export { IAddProfileDto } from '../../src/modules/profile/add/types';
+export { IGetProfileDto } from '../../src/modules/profile/get/types';
+export { IRegisterDto } from '../../src/modules/user/register/types';
+export { IUserDetailsDto } from '../../src/modules/user/details/types';
 
 export * from './broker';
 

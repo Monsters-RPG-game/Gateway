@@ -1,33 +1,41 @@
-import type * as enums from '../enums/index.js';
-import type { IProfileEntity } from '../structure/modules/profile/entity.js';
-import type { IUserEntity } from '../structure/modules/user/entity.js';
-import type ReqHandler from '../structure/reqHandler.js';
+import type ReqController from '../connections/router/reqController.js';
+import type { IProfileEntity } from '../modules/profile/entity.js';
+import type { IUserEntity } from '../modules/users/entity.js';
 import type { Locals } from 'express';
-import type session from 'express-session';
+import type { Session } from 'express-session';
+import type { JWTPayload } from 'jose';
+import type { ClientLog } from 'simpl-loggar';
 
-export interface IUsersTokens extends Locals {
-  reqHandler: ReqHandler;
-  userId: string | undefined;
+export interface IUserLocals extends Locals {
+  reqId: string;
+  reqController: ReqController;
+  logger: ClientLog;
   tempId: string;
   initializedProfile: boolean;
-  type: enums.EUserTypes;
   profile: IProfileEntity | undefined;
-  user: IUserEntity | undefined;
+  user: { userId: string; login: string } | undefined;
 
   [key: string]: unknown;
 }
 
-export interface IUserCredentials {
-  id: string;
+export interface IUserServerTokens {
+  access_token: string;
+  expires_in: number;
+  id_token: string;
+  refresh_token: string;
 }
 
-export interface IUserSession extends session.Session, Partial<session.SessionData> {
-  userId: string;
+export interface IUserSession extends Session {
+  userId?: string;
+  nonce?: string;
+  client?: string;
+  verifier?: string;
+  logout?: boolean;
 }
 
 export interface IUserBrokerInfo {
   userId: string | undefined;
-  tempId: string | undefined;
+  tempId?: string;
 }
 
 export interface ICachedUser {
@@ -35,15 +43,6 @@ export interface ICachedUser {
   profile: IProfileEntity | undefined;
 }
 
-export interface IAccessToken {
-  iat: number;
-  exp: number;
-  accountId: string;
-  grantId: string;
-  gty: string;
-  sessionUid: string;
-  clientId: string;
-  scope: string;
-  kind: string;
-  jti: string;
+export interface IUserAuthorizationsData extends JWTPayload {
+  login: string;
 }
