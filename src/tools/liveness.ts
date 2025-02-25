@@ -1,12 +1,11 @@
 import fs from 'fs';
-import * as path from 'node:path';
+import * as path from 'path';
 
 export default class Liveness {
   private _timer: NodeJS.Timeout | undefined;
 
   /**
-   * Generate path based on meta.url
-   * This is made in stupid way, but jest seems to be bugging out.
+   * Generate path based on meta.url.
    * @returns Path to probe.
    */
   private getPath = (): string => {
@@ -34,7 +33,7 @@ export default class Liveness {
 
   private updateProbe(): void {
     const location = import.meta.dirname
-      ? path.join(import.meta.dirname, '..', '..', '.livenessProbe')
+      ? path.join(import.meta.dirname, '..', '..', '..', '.livenessProbe')
       : this.getPath();
 
     fs.writeFileSync(location, Date.now().toString());

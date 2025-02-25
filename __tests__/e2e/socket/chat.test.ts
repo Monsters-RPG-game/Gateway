@@ -1,34 +1,33 @@
-import { afterAll, afterEach, beforeAll, describe, expect, it } from '@jest/globals';
-import State from '../../../src/state.js';
-import SocketServer from '../../utils/mocks/websocket.js';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from '@jest/globals';
+import FakeSocketServer from '../../utils/mocks/websocket.js'
+import { createCookie } from '../../utils/index.js'
+import Tokens from '../../utils/tokens.js'
+import State from '../../../src/tools/state.js';
 import * as enums from '../../../src/enums/index.js';
 import { EMessageSubTargets, EMessageTypes } from '../../../src/enums/index.js';
 import { ESocketType } from '../../../src/enums/index.js';
-import fakeData from '../../fakeData.json';
+import fakeUsers from '../../utils/fakeData/users.json';
 import type { ISocketInMessage, ISocketOutMessage } from '../../../src/connections/websocket/types/index.js';
 import { FakeBroker } from '../../utils/mocks/index.js';
 import { IFullError } from '../../../src/types/index.js';
-import type { IClient, ISimpleClient } from 'moc-socket';
+import { IFullMessageEntity } from '../../../src/modules/messages/entity.js';
+import { IUserEntity } from '../../../src/modules/users/entity.js';
+import { sleep } from '../../../src/utils/index.js';
+import { UnauthorizedError } from '../../../src/errors/index.js';
 import MocSocket from 'moc-socket';
-import { AwaitingAuthorizationError } from '../../../src/errors/index.js';
-import Utils from '../../utils/utils.js';
-import { IFullMessageEntity } from '../../../src/structure/modules/message/get/types.js';
-import { IUserEntity } from '../../../src/structure/modules/user/entity.js';
-import { fakeAccessToken } from '../../utils/index.js';
-import { WsServer } from 'moc-socket/lib/modules/servers/index.js';
-import { WebSocketServer } from 'ws';
+import { IClient } from 'moc-socket'
+import type { WsProvider } from 'moc-socket';
 
 describe('Socket - chat', () => {
   const fakeBroker = State.broker as FakeBroker;
-  const utils = new Utils();
-  let server: { createSimpleClient: () => ISimpleClient, createClient: () => IClient };
+  let server: WsProvider;
   let client: IClient;
-  const fakeUser = fakeData.users[0] as IUserEntity;
-  const fakeUser2 = fakeData.users[1] as IUserEntity;
+  const fakeUser = fakeUsers.data[0] as IUserEntity;
+  const fakeUser2 = fakeUsers.data[1] as IUserEntity;
   let clientOptions: Record<string, unknown>;
   let client2Options: Record<string, unknown>;
   const message: ISocketInMessage = {
-    payload: { message: 'asd', target: fakeUser2._id },
+    payload: { message: 'asd', target: fakeUser2._id as string },
     subTarget: enums.EMessageSubTargets.Send,
     target: enums.ESocketTargets.Chat,
   };
@@ -52,35 +51,40 @@ describe('Socket - chat', () => {
     ...baseMessage,
     subTarget: EMessageSubTargets.Get,
   };
+  const tokens = new Tokens(fakeUser)
+  const tokens2 = new Tokens(fakeUser2)
 
   beforeAll(async () => {
-    const loginToken1 = fakeAccessToken(fakeUser._id, 1);
-    const loginToken2 = fakeAccessToken(fakeUser2._id, 2);
-
-    await State.redis.addOidc(loginToken1.key, loginToken1.key, loginToken1.body);
-    await State.redis.addOidc(loginToken2.key, loginToken2.key, loginToken2.body);
+    const keyId = await tokens.createKey()
+    const loginToken1 = await tokens.createAccessToken()
+    tokens2.addKey(keyId)
+    const loginToken2 = await tokens2.createAccessToken()
 
     clientOptions = {
-      headers: { Authorization: `Bearer ${loginToken1.key}` },
+      headers: { Cookie: createCookie(enums.ETokens.Access, loginToken1 as string) },
     };
     client2Options = {
-      headers: { Authorization: `Bearer ${loginToken2.key}` },
+      headers: { Cookie: createCookie(enums.ETokens.Access, loginToken2 as string) },
     };
 
-    // Well. ESM borked plenty of stuff for reasons unknown to me...
-    server = (((MocSocket as unknown as { default: typeof MocSocket }).default as unknown as { createWsClient: (server: WebSocketServer) => WsServer }).createWsClient((State.socket as SocketServer).server) as { createSimpleClient: () => ISimpleClient, createClient: () => IClient });
-    client = server.createClient();
-
+    // I should finally fix this package...
+    server = MocSocket.createWsClient((State.socket as FakeSocketServer).server);
+    client = server.createClient()
     await client.connect(clientOptions);
-  });
+  })
 
-  afterAll(() => {
-    client?.disconnect();
-    State.keys = { keys: [] };
-  });
+  beforeEach(async () => {
+    await tokens.initLoginParamsForWebsocket(fakeBroker)
+  })
 
-  afterEach(() => {
+  afterEach(async () => {
     fakeBroker.getStats()
+    fakeBroker.clearActions()
+  })
+
+  afterAll(async () => {
+    await tokens.cleanUp()
+    client?.disconnect();
   })
 
   describe('Should throw', () => {
@@ -92,11 +96,11 @@ describe('Socket - chat', () => {
       });
 
       it(`User not logged in`, async () => {
-        await client2.connect();
-        const target = new AwaitingAuthorizationError();
+        await client2.connect(client2Options);
+        const target = new UnauthorizedError();
 
-        await utils.sleep(200);
-        const [message] = client2.getLastMessages() as ISocketOutMessage[];
+        await sleep(50);
+        const [message] = client2.getLastMessages(10, true) as ISocketOutMessage[];
         const { name } = message?.payload as IFullError;
         client2.disconnect();
 
@@ -113,7 +117,7 @@ describe('Socket - chat', () => {
     afterEach(async () => client2.disconnect());
 
     it(`No messages`, async () => {
-      await client2.connect();
+      await client2.connect(client2Options);
       const data = await client2.sendAsyncMessage(message, { timeout: 100 });
       expect(data).toEqual(undefined);
       client2.disconnect();
@@ -123,26 +127,6 @@ describe('Socket - chat', () => {
       fakeBroker.addAction({
         shouldFail: false,
         returns: {
-          payload: [
-            {
-              _id: fakeUser._id,
-              login: fakeUser.login,
-              verified: false,
-              type: enums.EUserTypes.User,
-            },
-          ],
-          target: enums.EMessageTypes.Send,
-        },
-      }, enums.EUserTargets.GetName)
-
-      fakeBroker.addAction({
-        shouldFail: false,
-        returns: { payload: { _id: fakeUser._id }, target: enums.EMessageTypes.Send },
-      }, enums.EProfileTargets.Get)
-
-      fakeBroker.addAction({
-        shouldFail: false,
-        returns: {
           payload: {
             a: [
               {
@@ -154,39 +138,19 @@ describe('Socket - chat', () => {
           },
           target: EMessageTypes.Send,
         },
-      }, enums.EChatTargets.Get)
+      }, enums.EChatSubTargets.Get)
 
       await client2.connect(client2Options);
+      await sleep(200)
       const userMessage = (await client2.sendAsyncMessage(getMessage)) as ISocketOutMessage;
 
       expect(Object.keys((userMessage?.payload as Record<string, string>) ?? {}).length).toBeGreaterThan(0);
-      client2.disconnect();
     });
 
     it(`Read chat`, async () => {
       fakeBroker.addAction({
         shouldFail: false,
         returns: {
-          payload: [
-            {
-              _id: fakeUser._id,
-              login: fakeUser.login,
-              verified: false,
-              type: enums.EUserTypes.User,
-            },
-          ],
-          target: enums.EMessageTypes.Send,
-        },
-      }, enums.EUserTargets.GetName)
-
-      fakeBroker.addAction({
-        shouldFail: false,
-        returns: { payload: { _id: fakeUser._id }, target: enums.EMessageTypes.Send },
-      }, enums.EProfileTargets.Get)
-
-      fakeBroker.addAction({
-        shouldFail: false,
-        returns: {
           payload: {
             a: [
               {
@@ -198,9 +162,10 @@ describe('Socket - chat', () => {
           },
           target: EMessageTypes.Send,
         },
-      }, enums.EChatTargets.Get)
+      }, enums.EChatSubTargets.Get)
 
       await client2.connect(client2Options);
+      await sleep(200)
       const userMessage = (await client2.sendAsyncMessage(getMessage, { timeout: 100 })) as ISocketOutMessage;
 
       fakeBroker.addAction({
@@ -217,7 +182,7 @@ describe('Socket - chat', () => {
           },
           target: EMessageTypes.Send,
         },
-      }, enums.EChatTargets.Get)
+      }, enums.EChatSubTargets.Get)
 
       const userMessage2 = (await client2.sendAsyncMessage(
         {
@@ -237,7 +202,7 @@ describe('Socket - chat', () => {
           payload: {},
           target: EMessageTypes.Send,
         },
-      }, enums.EChatTargets.GetUnread)
+      }, enums.EChatSubTargets.GetUnread)
 
       const userMessage3 = (await client2.sendAsyncMessage(getUnread, { timeout: 100 })) as ISocketOutMessage;
       expect(Object.keys(userMessage3?.payload as Record<string, string>).length).toEqual(0);
@@ -245,26 +210,6 @@ describe('Socket - chat', () => {
     });
 
     it(`Get with details`, async () => {
-      fakeBroker.addAction({
-        shouldFail: false,
-        returns: {
-          payload: [
-            {
-              _id: fakeUser._id,
-              login: fakeUser.login,
-              verified: false,
-              type: enums.EUserTypes.User,
-            },
-          ],
-          target: enums.EMessageTypes.Send,
-        },
-      }, enums.EUserTargets.GetName)
-
-      fakeBroker.addAction({
-        shouldFail: false,
-        returns: { payload: { _id: fakeUser._id }, target: enums.EMessageTypes.Send },
-      }, enums.EProfileTargets.Get)
-
       fakeBroker.addAction({
         shouldFail: false,
         returns: {
@@ -279,10 +224,10 @@ describe('Socket - chat', () => {
           },
           target: EMessageTypes.Send,
         },
-      }, enums.EChatTargets.Get)
+      }, enums.EChatSubTargets.Get)
 
       await client2.connect(client2Options);
-
+      await sleep(200)
       const userMessage = (await client2.sendAsyncMessage(getMessage, { timeout: 100 })) as ISocketOutMessage;
       expect(Object.keys((userMessage?.payload as Record<string, string>) ?? {}).length).toBeGreaterThan(0);
 
@@ -293,13 +238,11 @@ describe('Socket - chat', () => {
             {
               _id: fakeUser._id,
               login: fakeUser.login,
-              verified: false,
-              type: enums.EUserTypes.User,
             },
           ],
           target: enums.EMessageTypes.Send,
         },
-      }, enums.EChatTargets.Get)
+      }, enums.EChatSubTargets.Get)
 
       fakeBroker.addAction({
         shouldFail: false,
@@ -315,7 +258,7 @@ describe('Socket - chat', () => {
           ],
           target: EMessageTypes.Send,
         },
-      }, enums.EChatTargets.Get)
+      }, enums.EChatSubTargets.Get)
 
       const userMessage2 = (await client2.sendAsyncMessage({
         ...getWithDetails,

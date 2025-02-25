@@ -2,13 +2,13 @@ import type { JestConfigWithTsJest } from 'ts-jest';
 
 const config: JestConfigWithTsJest = {
   verbose: true,
-  moduleDirectories: ['node_modules', 'src'],
+  moduleDirectories: ['node_modules', 'src', "__tests__", __dirname],
   moduleFileExtensions: ['js', 'ts', 'json'],
   testPathIgnorePatterns: ['build'],
   extensionsToTreatAsEsm: ['.ts'],
+  rootDir: "../",
   preset: 'ts-jest/presets/default-esm',
   testMatch: ['**/*.test.ts'],
-  transformIgnorePatterns: ['<rootDir>/node_modules/(?!(mongodb-memory-server/index.d.ts))'],
   testEnvironment: 'node',
   forceExit: true,
   clearMocks: true,
@@ -22,10 +22,10 @@ const config: JestConfigWithTsJest = {
       'ts-jest',
       {
         useESM: true,
-        tsconfig: "tsconfig.json",
+        tsconfig: "tsconfig.test.json",
       },
     ],
-  },
+  }
 };
 
 export default config;

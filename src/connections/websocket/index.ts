@@ -1,31 +1,27 @@
+import Log from 'simpl-loggar';
 import { WebSocketServer } from 'ws';
 import Router from './router.js';
 import * as enums from '../../enums/index.js';
 import * as errors from '../../errors/index.js';
-import State from '../../state.js';
-import GetProfileDto from '../../structure//modules/profile/get/dto.js';
-import UserDetailsDto from '../../structure/modules/user/details/dto.js';
-import ReqHandler from '../../structure/reqHandler.js';
+import GetProfileDto from '../../modules/profile/subModules/get/dto.js';
+import UserDetailsDto from '../../modules/users/subModules/details/dto.js';
 import getConfig from '../../tools/configLoader.js';
-import Log from '../../tools/logger/index.js';
-import { validateToken } from '../../tools/token.js';
+import State from '../../tools/state.js';
+import ReqController from '../router/reqController.js';
 import type * as types from './types/index.js';
 import type { ESocketType } from '../../enums/index.js';
-import type { IUserEntity } from '../../structure/modules/user/entity.js';
+import type ValidateTokenController from '../../modules/users/subModules/validateToken/index.js';
 import type { IFullError } from '../../types/index.js';
-import type { AdapterPayload } from 'oidc-provider';
 
 export default class WebsocketServer {
-  protected _server: WebSocketServer | null = null;
   private readonly _router: Router;
-  private _users: types.ISocketUser[] = [];
-  private _heartbeat: NodeJS.Timer | undefined;
+  protected _server: WebSocketServer | null = null;
 
   constructor() {
     this._router = new Router();
   }
 
-  protected get server(): WebSocketServer {
+  get server(): WebSocketServer {
     return this._server!;
   }
 
@@ -33,27 +29,15 @@ export default class WebsocketServer {
     this._server = value;
   }
 
-  private get heartbeat(): NodeJS.Timer {
-    return this._heartbeat as NodeJS.Timer;
-  }
+  protected accessor users: types.ISocketUser[] = [];
+  private accessor heartbeat: NodeJS.Timer | undefined;
 
-  private set heartbeat(value: NodeJS.Timer) {
-    this._heartbeat = value;
-  }
-
-  protected get users(): types.ISocketUser[] {
-    return this._users;
-  }
-
-  private get router(): Router {
+  get router(): Router {
     return this._router;
   }
 
-  getServer(): WebSocketServer {
-    return this.server;
-  }
   init(): void {
-    this._server = new WebSocketServer({
+    this.server = new WebSocketServer({
       port: getConfig().socketPort,
     });
     Log.log('Socket', `Started socket on port ${getConfig().socketPort}`);
@@ -75,7 +59,7 @@ export default class WebsocketServer {
 
   startListeners(): void {
     this.server.on('connection', (ws: types.ISocket, req) => {
-      this.errorWrapper(() => this.onUserConnected(ws, req.headers.cookie, req.headers.authorization), ws);
+      this.errorWrapper(() => this.onUserConnected(ws, req.headers.cookie), ws);
     });
     this.server.on('error', (err) => this.handleServerError(err));
     this.server.on('close', () => Log.log('Websocket', 'Server closed'));
@@ -116,13 +100,13 @@ export default class WebsocketServer {
 
   protected userDisconnected(ws: types.ISocket): void {
     if (!ws.userId) return;
-    this._users = this.users.filter((u) => {
+    this.users = this.users.filter((u) => {
       return u.userId !== ws.userId;
     });
   }
 
-  protected onUserConnected(ws: types.ISocket, cookies: string | undefined, header: string | undefined): void {
-    this.preValidateUser(ws, { cookies, header })
+  protected onUserConnected(ws: types.ISocket, cookies: string | undefined): void {
+    this.preValidateUser(ws, { cookies })
       .then(() => {
         ws.on('message', (message: string) => this.errorWrapper(() => this.handleUserMessage(message, ws), ws));
         ws.on('ping', () => this.errorWrapper(() => this.ping(ws), ws));
@@ -131,7 +115,7 @@ export default class WebsocketServer {
         ws.on('close', () => this.userDisconnected(ws));
       })
       .catch((err) => {
-        Log.error("Couldn't validate user token in websocket", err);
+        Log.error('Websocket', "Couldn't validate user token", (err as Error).message, (err as Error).stack);
         ws.close(
           1000,
           JSON.stringify({
@@ -170,95 +154,69 @@ export default class WebsocketServer {
     ws: types.ISocket,
     auth: {
       cookies: string | undefined;
-      header: string | undefined;
     },
   ): Promise<void> {
     const unauthorizedErrorMessage = JSON.stringify({
       type: enums.ESocketType.Error,
       payload: new errors.UnauthorizedError(),
     });
-    let access: string | undefined = undefined;
 
-    if (auth.header) {
-      const { header } = auth;
-      if (header.includes('Bearer')) {
-        access = header.split('Bearer')[1]!.trim();
-      }
-    } else if (auth.cookies) {
-      const preparedCookie = auth.cookies
-        .split(';')
-        .map((e) => e.split('='))
-        .find((e) => e[0]!.trim() === 'monsters.uid');
-
-      if (!preparedCookie || preparedCookie.length === 0) {
-        ws.close(1000, unauthorizedErrorMessage);
-        return;
-      }
-      access = preparedCookie[1];
+    if (!auth.cookies) {
+      ws.close(1000, unauthorizedErrorMessage);
+      return;
     }
+
+    const preparedCookie = auth.cookies
+      .split(';')
+      .map((e) => e.split('='))
+      .find((e) => (e[0]!.trim() as enums.ETokens) === enums.ETokens.Access);
+
+    if (!preparedCookie || preparedCookie.length === 0) {
+      ws.close(1000, unauthorizedErrorMessage);
+      return;
+    }
+    const access = preparedCookie[1];
 
     if (!access) {
       Log.error('Websocket', 'Client connected without providing login token');
-      ws.ttl = setTimeout(() => {
-        ws.close(1000, unauthorizedErrorMessage);
-      }, 2000);
-      ws.send(
-        JSON.stringify({
-          type: enums.ESocketType.Error,
-          payload: new errors.AwaitingAuthorizationError(),
-        } as types.ISocketOutMessage),
-      );
-    } else {
-      await this.validateUser(ws, access);
+      ws.close(1000, unauthorizedErrorMessage);
+      return;
     }
+
+    await this.validateUser(ws, access);
   }
 
   private async validateUser(ws: types.ISocket, access: string): Promise<void> {
-    const payload = await validateToken(access);
-    ws.validated = true;
     this.initializeUser(ws);
-    if (ws.ttl) clearTimeout(ws.ttl);
 
-    if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'testDev') {
-      const cachedToken = await State.redis.getOidcHash(`oidc:AccessToken:${payload.jti}`, payload.jti);
+    const controller = State.controllers.resolve(enums.EControllers.Users);
+    if (!controller) throw new errors.UnregisteredControllerError(enums.EControllers.Users);
 
-      if (!cachedToken) {
-        Log.error(
-          'User tried to log in using token, which does not exists in redis. Might just expired between validation and redis',
-        );
-        throw new errors.IncorrectTokenError();
-      }
-      const t = JSON.parse(cachedToken) as AdapterPayload;
-      if (Date.now() - new Date((t.exp as number) * 1000).getTime() > 0) {
-        Log.error('User tried to log in using expired token, which for some reason is in redis', {
-          token: payload.jti,
-        });
-        throw new errors.IncorrectTokenError();
-      }
-    }
+    const subController = controller.resolve(enums.EUserActions.ValidateToken) as ValidateTokenController;
+    if (!subController) throw new errors.UnregisteredControllerError(enums.EUserActions.ValidateToken);
 
-    ws.userId = payload.accountId;
-    const user = await State.redis.getCachedUser(payload.accountId);
+    const { login, userId } = await subController.executeWebsocket(ws, access);
+
+    ws.userId = userId;
+    const user = await State.redis.getCachedUser(userId);
     if (user) {
       ws.profile = user.profile;
     } else {
-      const account = (
-        await ws.reqHandler.user.getDetails([new UserDetailsDto({ id: payload.accountId })], {
-          userId: payload.accountId,
-          tempId: '',
+      const account = ((
+        await ws.reqController.user.getDetails([new UserDetailsDto({ id: userId })], {
+          userId,
         })
-      ).payload[0] as IUserEntity;
+      ).payload ?? [])?.[0];
       const profile = (
-        await ws.reqHandler.profile.get(new GetProfileDto(payload.accountId), {
-          userId: payload.accountId,
-          tempId: '',
+        await ws.reqController.profile.get(new GetProfileDto({ id: userId }), {
+          userId,
         })
       ).payload;
 
       if (!profile || !account) {
         Log.error(
           'Token validation',
-          'User tried to log in using token, that got validated, but there is no user or profile related to token. Is token fake ?',
+          `User token is valid, but there is no user related to it. This SHOULD NOT have happen and this is CRITICAL error. User sub ${login}`,
         );
         ws.close(
           1000,
@@ -275,12 +233,12 @@ export default class WebsocketServer {
     }
 
     const isAlreadyOnline = this.users.findIndex((u) => {
-      return u.userId === payload.accountId;
+      return u.userId === userId;
     });
 
     // #TODO This is broken and incorrectly sends messages back to user, who is logged in on 2 devices
     if (isAlreadyOnline > -1) {
-      this._users[isAlreadyOnline] = {
+      this.users[isAlreadyOnline] = {
         ...this.users[isAlreadyOnline],
         userId: this.users[isAlreadyOnline]!.userId,
         clients: [...this.users[isAlreadyOnline]!.clients, ws],
@@ -289,15 +247,15 @@ export default class WebsocketServer {
       return;
     }
 
-    this._users.push({ clients: [ws], userId: payload.accountId, retry: 0 });
+    this.users.push({ clients: [ws], userId, retry: 0 });
   }
 
   private initializeUser(ws: types.ISocket): void {
-    ws.reqHandler = new ReqHandler();
+    ws.reqController = new ReqController();
   }
 
   private handleUserMessage(mess: string, ws: types.ISocket): void {
-    let message: types.ISocketInMessage = { payload: undefined, subTarget: undefined!, target: undefined! };
+    let message: Partial<types.ISocketInMessage> = { payload: undefined, subTarget: undefined!, target: undefined! };
 
     if (mess.toString() === 'ping') return this.pong(ws);
 
@@ -309,44 +267,9 @@ export default class WebsocketServer {
 
     Log.log('Socket', 'Got new message', message);
 
-    if (!ws.validated) {
-      if (message.target !== enums.ESocketTargets.Authorization) {
-        return ws.close(
-          1000,
-          JSON.stringify({
-            type: enums.ESocketType.Error,
-            payload: new errors.UnauthorizedError(),
-          }),
-        );
-      }
-      const key = message.payload as { key: string | undefined };
-      if (!key?.key) {
-        return ws.close(
-          1000,
-          JSON.stringify({
-            type: enums.ESocketType.Error,
-            payload: new errors.UnauthorizedError(),
-          }),
-        );
-      }
-
-      this.validateUser(ws, key.key).catch(() => {
-        return ws.close(
-          1000,
-          JSON.stringify({
-            type: enums.ESocketType.Error,
-            payload: new errors.UnauthorizedError(),
-          }),
-        );
-      });
-      return undefined;
-    }
-
     switch (message.target) {
       case enums.ESocketTargets.Chat:
-        return this.router.handleChatMessage(message, ws);
-      case enums.ESocketTargets.Movement:
-        return this.router.handleMovementMessage(message, ws);
+        return this.router.handleChatMessage(message as types.ISocketInMessage, ws);
       default:
         return this.router.handleError(new errors.IncorrectTargetError(), ws);
     }

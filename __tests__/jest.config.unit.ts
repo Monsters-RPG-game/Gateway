@@ -3,7 +3,7 @@ import defaultConfig from './jest.config.default';
 
 const config: JestConfigWithTsJest = {
   ...defaultConfig,
-  roots: ['./unit'],
+  roots: ['./__tests__/unit'],
 };
 
 export default config;

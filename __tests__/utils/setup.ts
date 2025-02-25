@@ -1,6 +1,6 @@
 import { afterAll, afterEach, beforeAll } from '@jest/globals';
 import Connection from './connection.js';
-import State from '../../src/state.js';
+import State from '../../src/tools/state.js';
 import { FakeBroker } from './mocks/index.js';
 
 const connection = new Connection();
