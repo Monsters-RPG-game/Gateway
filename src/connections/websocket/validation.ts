@@ -1,13 +1,5 @@
-import { ECharacterState } from '../../enums/users.js';
-import { UserCannotMove } from '../../errors/index.js';
-import Validator from '../../tools/validation/index.js';
-import type {
-  IGetMessageBody,
-  IReadMessageBody,
-  ISocket,
-  ISocketInMessage,
-  ISocketSendMessageBody,
-} from './types/index.js';
+import Validator from '../../tools/validation.js';
+import type { IGetMessageBody, IReadMessageBody, ISocketInMessage, ISocketSendMessageBody } from './types/index.js';
 
 export default class Validation {
   preValidate(data: ISocketInMessage): void {
@@ -25,9 +17,5 @@ export default class Validation {
 
   validateReadMessage(data: IReadMessageBody): void {
     new Validator(data.chatId, 'chatId').isDefined().isBetween(24, 24);
-  }
-
-  validateCanMove(ws: ISocket): void {
-    if (ws.profile?.state === ECharacterState.Fight) throw new UserCannotMove();
   }
 }

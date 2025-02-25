@@ -1,4 +1,5 @@
 import WebsocketServer from '../../../src/connections/websocket/index.js';
+import Log from 'simpl-loggar'
 import { WebSocketServer } from 'ws';
 import * as errors from '../../../src/errors/index.js';
 import type * as types from '../../../src/connections/websocket/types/index.js';
@@ -28,7 +29,8 @@ export default class SocketServer extends WebsocketServer {
 
   override startListeners(): void {
     this.server.on('connection', (ws: types.ISocket, req) => {
-      this.errorWrapper(() => this.onUserConnected(ws, req.headers.cookie, req.headers.authorization), ws);
+      Log.debug("Fake socket", 'New client connected')
+      this.errorWrapper(() => this.onUserConnected(ws, req.headers.cookie), ws);
     });
   }
 }

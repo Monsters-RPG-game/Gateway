@@ -1,0 +1,39 @@
+{
+  "data": [
+    {
+      "user": "63e55edbe8a800060941121d",
+      "initialized": false,
+      "_id": "64649e334e19dfa5f70fd7bd"
+    },
+    {
+      "user": "63e55edbe8a800060941121e",
+      "initialized": false,
+      "_id": "64649e334e19dfa5f70fd7c3"
+    },
+    {
+      "user": "63e55edbe8a800060941123d",
+      "initialized": false,
+      "_id": "64649e334e19dfa5f70fd7c9"
+    },
+    {
+      "user": "63e55edbe8a800060941124d",
+      "initialized": false,
+      "_id": "64649e344e19dfa5f70fd7cf"
+    },
+    {
+      "user": "63e55edbe8a800060941125d",
+      "initialized": false,
+      "_id": "64649e344e19dfa5f70fd7d5"
+    },
+    {
+      "user": "63e55edbe8a800060941126d",
+      "initialized": false,
+      "_id": "64649e344e19dfa5f70fd7db"
+    },
+    {
+      "user": "63e55edbe8a800060941127d",
+      "initialized": false,
+      "_id": "64649e344e19dfa5f70fd7e1"
+    }
+  ]
+}

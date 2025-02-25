@@ -3,8 +3,8 @@ import defaultConfig from './jest.config.default';
 
 const config: JestConfigWithTsJest = {
   ...defaultConfig,
-  roots: ['./db'],
-  setupFilesAfterEnv: ['./utils/setup.ts'],
+  roots: ['./__tests__/db'],
+  setupFilesAfterEnv: ['./__tests__/utils/setup.ts'],
 };
 
 export default config;

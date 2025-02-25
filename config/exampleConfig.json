@@ -1,19 +1,17 @@
 {
-  "amqpURI": "rabbitUrl",
-  "redisURI": "redisUrl",
-  "corsOrigin": "*",
-  "myAddress": "http://localhost",
-  "httpPort": 80,
-  "socketPort": 81,
-  "mysql": {
-    "user": "mysqlUser",
-    "password": "mysqlPassword",
-    "host": "host",
-    "db": "db",
-    "port": 3306
-  },
+  "amqpURL": "amqp://user:password@address:port",
+  "mongoURL": "mongodb://user:password@address:port",
+  "corsOrigin": ["frontendAddress"],
+  "myAddress": "yourAddress",
+  "myDomain": "domainUsedByYourApp",
+  "authorizationAddress": "addressToAuthorizationsServer",
+  "authorizationInnerAddress": "addressToAuthorizationsServer",
+  "httpPort": 8080,
+  "socketPort": 8081,
+  "redisURL": "redis://user:password@address:port",
   "session": {
-    "secret": "sessionSecret",
-    "secured": false
+    "secret": "superSecretKeyPleaseDontLeakIt",
+    "secured": false,
+    "trustProxy": false
   }
 }
