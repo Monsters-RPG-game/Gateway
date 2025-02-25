@@ -1,6 +1,6 @@
+import Log from 'simpl-loggar';
 import * as enums from '../../enums/index.js';
 import * as errors from '../../errors/index.js';
-import Log from '../../tools/logger/index.js';
 import { generateTempId } from '../../utils/index.js';
 import type * as types from '../../types/index.js';
 import type amqplib from 'amqplib';
@@ -12,7 +12,7 @@ export default class Communicator {
     const body: types.IRabbitMessage = {
       user: undefined,
       payload: undefined,
-      subTarget: enums.EMessagesTargets.Send,
+      subTarget: enums.EMessagesSubTargets.Send,
       target: enums.EMessageTypes.Heartbeat,
     };
 
@@ -23,19 +23,11 @@ export default class Communicator {
       case enums.EServices.Messages:
         channel.sendToQueue(enums.EAmqQueues.Messages, Buffer.from(JSON.stringify(body)), { persistent: true });
         return;
-      case enums.EServices.Fights:
-        channel.sendToQueue(enums.EAmqQueues.Fights, Buffer.from(JSON.stringify(body)), { persistent: true });
-        return;
-      case enums.EServices.Maps:
-        channel.sendToQueue(enums.EAmqQueues.Maps, Buffer.from(JSON.stringify(body)), { persistent: true });
-        return;
-      case enums.EServices.Story:
-        channel.sendToQueue(enums.EAmqQueues.Story, Buffer.from(JSON.stringify(body)), { persistent: true });
-        return;
       default:
         throw new Error('Unknown message target');
     }
   };
+
   get queue(): types.ICommunicationQueue {
     return this._queue;
   }
@@ -76,15 +68,6 @@ export default class Communicator {
         return;
       case enums.EServices.Messages:
         channel.sendToQueue(enums.EAmqQueues.Messages, Buffer.from(JSON.stringify(body)));
-        return;
-      case enums.EServices.Fights:
-        channel.sendToQueue(enums.EAmqQueues.Fights, Buffer.from(JSON.stringify(body)));
-        return;
-      case enums.EServices.Maps:
-        channel.sendToQueue(enums.EAmqQueues.Maps, Buffer.from(JSON.stringify(body)));
-        return;
-      case enums.EServices.Story:
-        channel.sendToQueue(enums.EAmqQueues.Story, Buffer.from(JSON.stringify(body)));
         return;
       default:
         throw new Error('Incorrect service target');

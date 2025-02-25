@@ -1,16 +1,31 @@
+import Log from 'simpl-loggar';
 import type * as types from '../types/index.js';
 import fs from 'fs';
-import * as path from 'node:path';
 
 /**
- * Generate path based on meta.url
- * This is made in stupid way, but jest seems to be bugging out.
- * @param target Config path.
- * @returns Config path.
+ * Validate if config includes all required keys.
+ * @param config {types.IConfigInterface} Config.
+ * @returns {void} Void.
  */
-const getUrl = (target: string): string => {
-  const basePath = import.meta.url.split('/');
-  return path.join(basePath.splice(2, basePath.length - 1).join('/'), '..', '..', '..', 'config', target);
+const preValidate = (config: types.IConfigInterface): void => {
+  const configKeys = [
+    'amqpURL',
+    'mongoURL',
+    'corsOrigin',
+    'myAddress',
+    'myDomain',
+    'authorizationAddress',
+    'authorizationInnerAddress',
+    'httpPort',
+    'socketPort',
+    'redisURL',
+    'session',
+  ];
+
+  configKeys.forEach((k) => {
+    if (config[k as keyof types.IConfigInterface] === undefined || config[k as keyof types.IConfigInterface] === null)
+      throw new Error(`Config is incorrect. ${k} is missing in config or is set to undefined`);
+  });
 };
 
 /**
@@ -19,55 +34,24 @@ const getUrl = (target: string): string => {
  * @throws Error that no config was found.
  */
 export default function getConfig(): types.IConfigInterface {
-  let baseConfig: types.IConfigInterface = JSON.parse(
-    fs
-      .readFileSync(
-        import.meta.dirname
-          ? path.join(import.meta.dirname, '..', '..', 'config', 'exampleConfig.json')
-          : getUrl('exampleConfig.json'),
-      )
-      .toString(),
-  ) as types.IConfigInterface;
+  let config: Partial<types.IConfigInterface> = {};
 
   switch (process.env.NODE_ENV) {
     case 'testDev':
-      baseConfig = JSON.parse(
-        fs
-          .readFileSync(
-            import.meta.dirname
-              ? path.join(import.meta.dirname, '..', '..', 'config', 'testConfig.json')
-              : getUrl('testConfig.json'),
-          )
-          .toString(),
-      ) as types.IConfigInterface;
+      config = JSON.parse(fs.readFileSync('./config/testConfig.json').toString()) as types.IConfigInterface;
       break;
-    case 'dev':
+    case 'development':
     case 'test':
-      baseConfig = JSON.parse(
-        fs
-          .readFileSync(
-            import.meta.dirname
-              ? path.join(import.meta.dirname, '..', '..', 'config', 'devConfig.json')
-              : getUrl('devConfig.json'),
-          )
-          .toString(),
-      ) as types.IConfigInterface;
+      config = JSON.parse(fs.readFileSync('./config/devConfig.json').toString()) as types.IConfigInterface;
       break;
     case 'production':
-      baseConfig = JSON.parse(
-        fs
-          .readFileSync(
-            import.meta.dirname
-              ? path.join(import.meta.dirname, '..', '..', 'config', 'prodConfig.json')
-              : getUrl('prodConfig.json'),
-          )
-          .toString(),
-      ) as types.IConfigInterface;
+      config = JSON.parse(fs.readFileSync('./config/prodConfig.json').toString()) as types.IConfigInterface;
       break;
     default:
+      Log.error('Config loader', `Could not find configs for env ${process.env.NODE_ENV}`);
       throw new Error('No config files');
   }
 
-  if (!baseConfig.session) throw new Error('Config is incorrect');
-  return baseConfig;
+  preValidate(config as types.IConfigInterface);
+  return config as types.IConfigInterface;
 }

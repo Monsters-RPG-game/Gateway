@@ -8,36 +8,10 @@ body:
       value: Before submitting new issue, please make sure similar problem/idea hasn't been already submitted by someone else. 😃
 
   - type: textarea
-    id: timeWhenOccurred
-    attributes:
-      label: Time when occurred
-      placeholder: Try to provide time and date. For example '15.02.2024 ~08:00'
-    validations:
-      required: true
-
-  - type: textarea
     id: reproducibility
     attributes:
       label: Reproducibility
       description: How often does this problems occurs. Every time you do something ? After time of inactivity ? Once a day ?
-    validations:
-      required: true
-
-  - type: dropdown
-    attributes:
-      multiple: false
-      label: Does this problem occurs while you are logged in ?
-      options:
-        - "Yes"
-        - "No"
-    validations:
-      required: true
-
-  - type: textarea
-    id: client
-    attributes:
-      label: Client
-      description: What did you use when this problem occurred ? Web client from our repo ? Custom client ? API utility like postman ?
     validations:
       required: true
 
