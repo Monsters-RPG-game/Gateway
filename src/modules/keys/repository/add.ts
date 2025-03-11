@@ -14,7 +14,7 @@ export default class AddKey implements IAddKey {
   readonly qi: string;
 
   constructor(data: JWK) {
-    this.kty = data.kty;
+    this.kty = data.kty!;
     this.n = data.n as string;
     this.e = data.e as string;
     this.d = data.d as string;

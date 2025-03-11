@@ -90,7 +90,13 @@ export default class TokensController {
 
   static async validateToken(token: string): Promise<ITokenData> {
     const privateKey = await this.getKey(token);
-    const publicKey = await importJWK(privateKey, 'RS256');
+    const publicKey = await importJWK({
+      kty: 'RSA',
+      e: privateKey.e,
+      n: privateKey.n,
+      alg: 'RS256',
+      kid: privateKey.kid,
+    });
 
     const result = await jwtVerify(token, publicKey);
     const parsed = result.payload as ITokenData;

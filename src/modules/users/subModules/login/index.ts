@@ -221,6 +221,6 @@ export default class LoginController
     const client = await this.clientsRepository.getByName((req.session as IUserSession).client!);
     delete (req.session as IUserSession).client;
 
-    return `${client!.redirectUrl}/?feedback=success`;
+    return `${client!.redirectUrl}?feedback=success`;
   }
 }

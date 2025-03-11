@@ -30,7 +30,7 @@ export default class FinishRegisterController implements IAbstractSubController<
       userId: data.userId,
     });
 
-    return `${client!.redirectUrl}/?feedback=success`;
+    return `${client!.redirectUrl}?feedback=success`;
   }
 
   private async validateReq(nonce: string): Promise<void> {

@@ -11,7 +11,7 @@ import type * as types from '../../types/index.js';
 
 export default class Broker {
   private _closed: boolean = false;
-  private _connection: amqplib.Connection | null = null;
+  private _connection: amqplib.ChannelModel | null = null;
   private _connectionTries = 0;
   private _channelTries = 0;
   private _services: {
