@@ -9,7 +9,7 @@ export default class SessionStore extends Store {
    * @param sid Session id.
    * @param callback Callback for session data.
    */
-  @Log.decorateSyncDebug('Session', 'Getting session')
+  @Log.decorateDebug('Session', 'Getting session')
   get(sid: string, callback: (err: Error | null, session?: IUserSession | null) => void): void {
     State.redis
       .getSession(sid)
@@ -28,7 +28,7 @@ export default class SessionStore extends Store {
    * @param session Session data.
    * @param callback Callback, in case of error.
    */
-  @Log.decorateSyncDebug('Session', 'Setting session')
+  @Log.decorateDebug('Session', 'Setting session')
   set(sid: string, session: IUserSession, callback?: (err?: Error | null) => void): void {
     State.redis
       .addSession(sid, session)
@@ -46,7 +46,7 @@ export default class SessionStore extends Store {
    * @param sid Session id.
    * @param callback Callback, in case of error.
    */
-  @Log.decorateSyncDebug('Session', 'Removing session')
+  @Log.decorateDebug('Session', 'Removing session')
   destroy(sid: string, callback?: (err?: Error | null) => void): void {
     State.redis
       .removeSession(sid)
@@ -65,7 +65,7 @@ export default class SessionStore extends Store {
    * @param session Session data.
    * @param callback Callback, in case of error.
    */
-  @Log.decorateSyncDebug('Session', 'Touching session')
+  @Log.decorateDebug('Session', 'Touching session')
   override touch(sid: string, session: IUserSession, callback?: (err?: Error | null) => void): void {
     State.redis
       .addSession(sid, session)

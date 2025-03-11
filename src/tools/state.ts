@@ -72,7 +72,7 @@ class State implements IState {
     this._controllers = val;
   }
 
-  @Log.decorateSyncLog('Statet', 'Application closed')
+  @Log.decorateLog('Statet', 'Application closed')
   kill(): void {
     this.alive = false;
 

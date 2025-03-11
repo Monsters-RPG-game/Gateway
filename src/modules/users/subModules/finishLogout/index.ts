@@ -34,6 +34,6 @@ export default class FinishLogoutController implements IAbstractSubController<st
     delete (req.session as IUserSession).client;
     delete (req.session as IUserSession).userId;
 
-    return `${clientData.redirectUrl}/?feedback=success`;
+    return `${clientData.redirectUrl}?feedback=success`;
   }
 }

@@ -43,7 +43,8 @@ export default class RemoveAccountController implements IAbstractSubController<v
 
     const body = JSON.stringify({
       client_id: client.clientId,
-      token: tokens.refreshToken,
+      refresh: tokens.refreshToken,
+      access: tokens.accessToken,
     });
 
     const res = await fetch(`${getConfig().authorizationInnerAddress}/interaction/account`, {

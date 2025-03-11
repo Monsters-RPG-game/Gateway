@@ -7,7 +7,7 @@ import type { JWK } from 'jose';
 
 export default class Keys {
   private getKey = async (): Promise<JWK> => {
-    const { privateKey } = await generateKeyPair('RS256', { modulusLength: 2048 });
+    const { privateKey } = await generateKeyPair('RS256', { modulusLength: 2048, extractable: true });
     return exportJWK(privateKey);
   };
 
