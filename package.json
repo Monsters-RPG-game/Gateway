@@ -43,7 +43,7 @@
     "jose": "^6.0.7",
     "mongoose": "8.12.1",
     "redis": "^4.7.0",
-    "simpl-loggar": "^0.6.0",
+    "simpl-loggar": "^0.6.1",
     "swagger-jsdoc": "6.2.8",
     "swagger-ui-express": "5.0.1",
     "ws": "8.18.1"
