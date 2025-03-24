@@ -39,6 +39,7 @@ export default class Router {
     this.initWebsocket();
     this.initRouter();
     this.initServer();
+    this.initMetricsRouter();
     this.initSecuredRouter();
     this.initFourOhFour();
     this.initErrHandler();
@@ -82,6 +83,13 @@ export default class Router {
    */
   private initRouter(): void {
     this.router.initRoutes();
+  }
+
+  /**
+   * Init metrics routes.
+   */
+  private initMetricsRouter(): void {
+    this.router.initMetricsRoutes();
   }
 
   /**

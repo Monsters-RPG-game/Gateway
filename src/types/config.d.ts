@@ -14,4 +14,7 @@ export interface IConfigInterface {
     secured: boolean;
     trustProxy: boolean;
   };
+  metrics: {
+    loki: string;
+  };
 }

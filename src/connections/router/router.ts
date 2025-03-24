@@ -1,3 +1,4 @@
+import { client } from '@monsters/metrics';
 import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import Middleware from './middleware.js';
@@ -52,6 +53,12 @@ export default class AppRouter {
     // Disable favico route
     this.router.all('/favicon.ico', (_req, res) => {
       res.sendStatus(404);
+    });
+  }
+
+  initMetricsRoutes(): void {
+    this.router.get('/metrics', async (_req, res) => {
+      res.header('Content-Type', client.contentType).send(await client.metrics());
     });
   }
 

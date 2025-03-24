@@ -1,4 +1,4 @@
-import Validation from '../../../../tools/validation.js';
+import Validation from '@monsters/validator';
 import type { IGetMessagesDto } from './types.js';
 
 /**

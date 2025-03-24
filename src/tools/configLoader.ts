@@ -1,5 +1,5 @@
 import Log from 'simpl-loggar';
-import type * as types from '../types/index.js';
+import type * as types from '../types/config.js';
 import fs from 'fs';
 
 /**

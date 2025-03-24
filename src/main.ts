@@ -5,20 +5,13 @@ import Redis from './connections/redis/index.js';
 import Router from './connections/router/index.js';
 import WebsocketServer from './connections/websocket/index.js';
 import Bootstrap from './tools/bootstrap.js';
+import getConfig from './tools/configLoader.js';
 import Liveness from './tools/liveness.js';
 import State from './tools/state.js';
 import type { IFullError } from './types/index.js';
 
 class App {
-  private _liveness: Liveness | undefined;
-
-  private get liveness(): Liveness | undefined {
-    return this._liveness;
-  }
-
-  private set liveness(val: Liveness | undefined) {
-    this._liveness = val;
-  }
+  private accessor liveness: Liveness | undefined;
 
   init(): void {
     this.configLogger();
@@ -34,10 +27,13 @@ class App {
   private close(): void {
     this.liveness?.close();
     State.kill();
+
+    process.exit(0);
   }
 
   private configLogger(): void {
     Log.setPrefix('monsters');
+    Log.setLokiTransporter(getConfig().metrics.loki);
   }
 
   @Log.decorateTime('App initialized')
