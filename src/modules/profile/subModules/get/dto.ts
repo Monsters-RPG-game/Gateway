@@ -1,5 +1,5 @@
+import Validation from '@monsters/validator';
 import { NoDataProvidedError } from '../../../../errors/index.js';
-import Validation from '../../../../tools/validation.js';
 import type { IGetProfileDto } from './types.js';
 
 /**

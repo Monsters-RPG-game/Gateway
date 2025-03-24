@@ -152,18 +152,14 @@ Each config includes few elements:
   "corsOrigin": ["http://localhost"]
   "httpPort": 80,
   "socketPort": 81,
-  "mysql": {
-    "user": "mysqlUser",
-    "password": "mysqlPassword",
-    "host": "host",
-    "db": "db",
-    "port": 3306
-  },
   "myDomain": ".domain.com",
   "session": {
     "secret": "superSecretPasswordPleaseDoNotLeakIt",
     "secured": true,
     "trustProxy": true
+  },
+  "metrics": {
+    "loki": "loki address"
   }
 }
 ```
@@ -178,16 +174,27 @@ mongoURL is address for mongoDB
 
 authorizationAddress is address for authorization server, which should be utilized
 
-authorizationInnerAddress is address for authorizations server located in k8s/docker network. This is meant for production env. For any other, simply copy value fom `authorizationAddress`
+authorizationInnerAddress is address for authorizations server located in k8s/docker network. This is meant for production env. For any other, simply copy value from `authorizationAddress`
 
 redisURL is address for redis, which is used to cache data like user sessions and connection params
 
 myDomain is domain, that this application will work on. It should be prefixed with dot. This config is used to set cookies, for production for whole domain with subdomains. Either add some random domain in /etc/hosts, or comment all ( atm 2 ) occurrences.
 
+metrics is a config for open telemetry. Currently those json files include loki address, while .env file should include open telemetry address
+
 session is config for express-session.
 - Secret is secret, which should be used to generate cookies for session
 - Secured is boolean, which is true, sets secured cookies. This is used, because localhost will not set secured cookies in modern browsers
 - TrustProxy Is config, which will trust `X-Forwarded-For` cookie. Disabled it, unless your api is behind a load balancer like nginx
+
+#### Dot env
+
+In addition to this, there is also a need to have dot env file. This file should be loaded manually before starting this app, because data from .env is loaded to initialize metrics. This file should include:
+```env
+NODE_METRICS_ADDRESS=http://localhost:4318/v1
+```
+
+This address should not include full paths, but only prefix. Postfix for /metrics and /traces will be added manually. If you wish to use another postfixes, you need to manually rewrite package responsible for metrics. There is no other way to do it manually.
 
 ## 4. Docs
 

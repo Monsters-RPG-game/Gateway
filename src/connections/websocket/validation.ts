@@ -1,4 +1,4 @@
-import Validator from '../../tools/validation.js';
+import Validator from '@monsters/validator';
 import type { IGetMessageBody, IReadMessageBody, ISocketInMessage, ISocketSendMessageBody } from './types/index.js';
 
 export default class Validation {

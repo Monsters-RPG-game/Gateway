@@ -13,5 +13,8 @@
     "secret": "superSecretKeyPleaseDontLeakIt",
     "secured": false,
     "trustProxy": false
+  },
+  "metrics": {
+    "loki": "loki address"
   }
 }

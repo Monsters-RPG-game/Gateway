@@ -1,4 +1,4 @@
-import Validation from '../../../../tools/validation.js';
+import Validation from '@monsters/validator';
 import type { IStartLogoutDto } from './types.js';
 
 export default class StartLogoutDto implements IStartLogoutDto {

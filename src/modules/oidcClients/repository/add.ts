@@ -1,4 +1,4 @@
-import Validation from '../../../tools/validation.js';
+import Validation from '@monsters/validator';
 import type { IAddOidcClient } from './types.js';
 
 export default class AddOidcClient implements IAddOidcClient {

@@ -1,5 +1,5 @@
+import Validation from '@monsters/validator';
 import { MissingArgError } from '../../../../errors/index.js';
-import Validation from '../../../../tools/validation.js';
 import type { ILoginDto } from './types.js';
 
 export default class LoginDto implements ILoginDto {
