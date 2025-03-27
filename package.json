@@ -1,6 +1,6 @@
 {
   "name": "gateway",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Main point of access for monsters microservice. This project is a REST API",
   "productName": "Gateway",
   "author": "https://github.com/Virus288",
@@ -10,7 +10,7 @@
   "main": "build/src/main.js",
   "scripts": {
     "start": "node --import ./node_modules/@monsters/metrics/lib/metrics.js --experimental-loader=@opentelemetry/instrumentation/hook.mjs build/src/main.js",
-    "start:dev": "concurrently 'npm run build:watch' 'cross-env NODE_ENV=development nodemon --exec \"node --import ./node_modules/@monsters/metrics/lib/metrics.js --experimental-loader=@opentelemetry/instrumentation/hook.mjs\" build/src/main.js'",
+    "start:dev": "concurrently 'npm run build:watch' 'cross-env NODE_ENV=development nodemon build/src/main.js'",
     "start:testDev": "cross-env NODE_ENV=testDev node --import ./node_modules/@monsters/metrics/lib/metrics.js --experimental-loader=@opentelemetry/instrumentation/hook.mjs build/src/main.js",
     "build": "tsc -p tsconfig.json",
     "build:watch": "tsc -w -p tsconfig.json",
