@@ -9,10 +9,10 @@ test:
 	&& npm run test:db
 
 buildDocker:
-	docker build -t monsters/monsters-gateway .
+	export $(shell sed 's/=.*//' .env) && docker build $(shell sed 's/^/--build-arg /' .env) -t monsters/monsters-gateway .
 
 buildTestDocker:
-	docker build --build-arg NODE_ENV=development -t monsters/monsters-gateway-test .
+	export $(shell sed 's/=.*//' .env) && docker build $(shell sed 's/^/--build-arg /' .env) --build-arg NODE_ENV=development -t monsters/monsters-gateway-test .
 
 integrationTestsMessages:
 	npx cross-env NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest --config  __tests__/jest.config.integration.ts
