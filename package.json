@@ -76,7 +76,7 @@
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-jest": "28.11.0",
     "eslint-plugin-jsdoc": "^50.0.0",
-    "eslint-plugin-prettier": "5.2.3",
+    "eslint-plugin-prettier": "5.2.5",
     "eslint-plugin-sort-class-members": "1.21.0",
     "jest": "29.7.0",
     "moc-socket": "0.2.3",
