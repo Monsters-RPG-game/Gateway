@@ -1,6 +1,6 @@
 {
   "name": "gateway",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Main point of access for monsters microservice. This project is a REST API",
   "productName": "Gateway",
   "author": "https://github.com/Virus288",

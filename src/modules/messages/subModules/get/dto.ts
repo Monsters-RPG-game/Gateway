@@ -18,7 +18,7 @@ export default class GetMessagesDto implements IGetMessagesDto {
   target: string | undefined;
 
   constructor(data: IGetMessagesDto) {
-    this.page = data.page;
+    this.page = data.page ?? 1;
     this.target = data.target;
 
     this.validate();

@@ -10,8 +10,8 @@ export default class SendMessagesController implements types.IAbstractSubControl
     const { reqController, user } = res.locals;
 
     const users = await reqController.user.getDetails(
-      [new UserDetailsDto({ name: data.receiver }), new UserDetailsDto({ id: user?.userId })],
-      { userId: user?.userId },
+      [new UserDetailsDto({ name: data.receiver }), new UserDetailsDto({ id: user?._id })],
+      { userId: user?._id },
     );
     if (!users || users.payload.length === 0) {
       throw new NoUserWithProvidedName();
@@ -29,9 +29,9 @@ export default class SendMessagesController implements types.IAbstractSubControl
           sender: data.receiver,
           receiver: receiver._id as string,
         },
-        user!.userId,
+        user!._id,
       ),
-      { userId: user?.userId },
+      { userId: user?._id },
     );
 
     State.socket.sendToUser(

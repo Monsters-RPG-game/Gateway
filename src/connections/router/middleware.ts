@@ -39,10 +39,10 @@ export default class Middleware {
         .execute(req, res)
         .then(({ login, userId }) => {
           if (!res.locals.user) {
-            res.locals.user = { userId, login };
+            res.locals.user = { _id: userId, login };
           } else {
             res.locals.user.login = login;
-            res.locals.user.userId = userId;
+            res.locals.user._id = userId;
           }
           res.locals.logger.createContext({ login });
           next();
@@ -58,14 +58,14 @@ export default class Middleware {
   static async initUserProfile(_req: express.Request, res: IResponse, next: express.NextFunction): Promise<void> {
     try {
       // Validate if profile is initialized
-      let user = await State.redis.getCachedUser(res.locals.user!.userId);
+      let user = await State.redis.getCachedUser(res.locals.user!._id);
 
       if (!user) {
-        user = await Middleware.fetchUserProfile(res.locals.user!.userId);
+        user = await Middleware.fetchUserProfile(res.locals.user!._id);
       }
 
       res.locals.profile = user.profile;
-      res.locals.user = user.account;
+      res.locals.user = user.account as { _id: string; login: string };
       next();
     } catch (err) {
       handleErr(err as types.IFullError, res);

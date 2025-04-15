@@ -8,7 +8,6 @@ import { FakeBroker } from '../../utils/mocks/index.js';
 import { NoDataProvidedError, UnauthorizedError } from '../../../src/errors/index.js';
 import { ETokens } from '../../../src/enums/tokens.js';
 import { IUserEntity } from '../../../src/modules/users/entity.js';
-import mongoose from 'mongoose';
 import Tokens from '../../utils/tokens.js'
 
 describe('Get profile - validate auth', () => {
@@ -16,7 +15,6 @@ describe('Get profile - validate auth', () => {
   const { app } = State.router;
   const userEntity: IUserEntity = {
     _id: fakeUsers.data[0]!._id as string,
-    userId: new mongoose.Types.ObjectId().toString(),
     login: fakeUsers.data[0]!.login,
   }
   const tokens = new Tokens(userEntity)

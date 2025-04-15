@@ -8,7 +8,7 @@ export default class DebugGetAllUsersController implements types.IAbstractSubCon
 
     return (
       await reqController.user.debugGetAll(data, {
-        userId: user?.userId,
+        userId: user?._id,
       })
     ).payload;
   }

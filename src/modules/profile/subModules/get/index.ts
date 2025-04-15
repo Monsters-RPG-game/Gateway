@@ -15,7 +15,7 @@ export default class GetProfileController implements types.IAbstractSubControlle
     }
 
     const users = await reqController.user.getDetails([new UserDetailsDto({ name: data?.name, id: data?.id })], {
-      userId: user?.userId,
+      userId: user?._id,
     });
 
     if (
@@ -32,7 +32,7 @@ export default class GetProfileController implements types.IAbstractSubControlle
 
     return (
       await reqController.profile.get(profileDto, {
-        userId: user?.userId,
+        userId: user?._id,
       })
     ).payload;
   }

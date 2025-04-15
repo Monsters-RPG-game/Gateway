@@ -5,6 +5,6 @@ export default class ReadMessagesController implements types.IAbstractSubControl
   async execute(data: ReadMessagesDto, res: types.IResponse): Promise<void> {
     const { reqController, user } = res.locals;
 
-    await reqController.message.read(data, { userId: user?.userId });
+    await reqController.message.read(data, { userId: user?._id });
   }
 }

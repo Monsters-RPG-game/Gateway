@@ -100,6 +100,8 @@ export default class WebsocketServer {
 
   protected userDisconnected(ws: types.ISocket): void {
     if (!ws.userId) return;
+
+    Log.log('Websocket', `User ${ws?.userId} disconnected`);
     this.users = this.users.filter((u) => {
       return u.userId !== ws.userId;
     });

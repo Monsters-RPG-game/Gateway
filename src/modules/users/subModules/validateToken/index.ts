@@ -1,6 +1,6 @@
 import Log from 'simpl-loggar';
 import { ETokens } from '../../../../enums/tokens.js';
-import { InvalidRequest, NoUserWithProvidedName } from '../../../../errors/index.js';
+import { InvalidRequest, NoUserWithProvidedName, UnauthorizedError } from '../../../../errors/index.js';
 import TokenController from '../../../tokens/index.js';
 import UserDetailsDto from '../details/dto.js';
 import type ReqController from '../../../../connections/router/reqController.js';
@@ -17,7 +17,7 @@ export default class ValidateTokenController
   ): Promise<{ login: string; tokenTTL: string; realTokenTTL: string; userId: string }> {
     const cookie = (req.cookies as Record<string, string>)[ETokens.Access];
     Log.debug('Verify - express', `User token ${cookie}`);
-    if (!cookie) throw new InvalidRequest();
+    if (!cookie) throw new UnauthorizedError();
 
     return this.validate(res.locals.reqController, cookie);
   }
