@@ -10,7 +10,7 @@ export default class GetAllUsersController implements types.IAbstractSubControll
 
     return (
       await reqController.user.getDetails([data], {
-        userId: user?.userId,
+        userId: user?._id,
       })
     ).payload;
   }

@@ -8,7 +8,7 @@ export default class GetUnreadMessagesController implements types.IAbstractSubCo
 
     return (
       await reqController.message.getUnread(data, {
-        userId: user?.userId,
+        userId: user?._id,
       })
     ).payload;
   }

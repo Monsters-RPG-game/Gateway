@@ -13,7 +13,7 @@ export interface IUserLocals extends Locals {
   tempId: string;
   initializedProfile: boolean;
   profile: IProfileEntity | undefined;
-  user: { userId: string; login: string } | undefined;
+  user: { _id: string; login: string } | undefined;
 
   [key: string]: unknown;
 }

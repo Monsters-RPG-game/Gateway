@@ -9,6 +9,7 @@ import { initSecuredUserRoutes, initUserRoutes } from './modules/user/index.js';
 import { FourOhFour } from '../../errors/index.js';
 import State from '../../tools/state.js';
 import type express from 'express';
+import type http from 'http';
 import type swaggerJsdoc from 'swagger-jsdoc';
 import fs from 'fs';
 
@@ -41,11 +42,17 @@ export default class AppRouter {
     initMessagesRoutes(this.router);
   }
 
-  initWebsocket(app: express.Express): void {
-    app.get('/ws', (req, _res) => {
-      State.socket.server.handleUpgrade(req, req.socket, Buffer.from(''), (socket) => {
-        State.socket.server.emit('connection', socket, req);
-      });
+  initWebsocket(server: http.Server): void {
+    server.on('upgrade', (req, socket) => {
+      const { url } = req;
+
+      if (url === '/ws') {
+        State.socket.server.handleUpgrade(req, req.socket, Buffer.from(''), (ws) => {
+          State.socket.server.emit('connection', ws, req);
+        });
+      } else {
+        socket.destroy();
+      }
     });
   }
 

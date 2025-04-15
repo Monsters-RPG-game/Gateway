@@ -10,7 +10,6 @@ import { IFullError } from '../../../src/types/index.js';
 import { MissingArgError } from '../../../src/errors/index.js';
 import { EMessageTypes, EProfileSubTargets, ETokens, EUserSubTargets } from '../../../src/enums/index.js';
 import { IUserEntity } from '../../../src/modules/users/entity';
-import mongoose from 'mongoose';
 import Tokens from '../../utils/tokens.js'
 
 describe('Get detailed', () => {
@@ -22,7 +21,6 @@ describe('Get detailed', () => {
   }
   const userEntity: IUserEntity = {
     _id: fakeUsers.data[0]!._id as string,
-    userId: new mongoose.Types.ObjectId().toString(),
     login: fakeUsers.data[0]!.login,
   }
   const tokens = new Tokens(userEntity)

@@ -36,9 +36,9 @@ export default class Router {
   init(): void {
     this.initDocumentation();
     this.initMiddleware();
-    this.initWebsocket();
     this.initRouter();
     this.initServer();
+    this.initWebsocket();
     this.initMetricsRouter();
     this.initSecuredRouter();
     this.initFourOhFour();
@@ -103,7 +103,7 @@ export default class Router {
    * Init websocket upgrade route.
    */
   private initWebsocket(): void {
-    this.router.initWebsocket(this.app);
+    this.router.initWebsocket(this.server);
   }
 
   /**
@@ -117,8 +117,9 @@ export default class Router {
    * Initialize http server.
    */
   private initServer(): void {
-    if (process.env.NODE_ENV === 'test') return;
     this._server = http.createServer(this.app);
+
+    if (process.env.NODE_ENV === 'test') return;
 
     this.server.listen(getConfig().httpPort, () => {
       Log.log('Server', `Listening on ${getConfig().httpPort}`);
