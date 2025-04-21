@@ -5,15 +5,15 @@ import State from '../../src/tools/state.js'
 import fakeProfiles from './fakeData/profiles.json'
 import TokensController from '../../src/modules/tokens/index.js';
 import KeyRepository from '../../src/modules/keys/repository/index.js';
-import KeyModel from '../../src/modules/keys/model.js';
 import { IUserEntity } from '../../src/modules/users/entity.js';
 import { EProfileSubTargets, EUserSubTargets } from '../../src/enums/target.js';
 import { IProfileEntity } from '../../src/modules/profile/entity.js';
 import { EMessageTypes } from '../../src/enums/connections.js';
 import Log from 'simpl-loggar'
+import { IKeyRepository } from '../../src/modules/keys/repository/types.js'
 
 export default class Tokens {
-  private _keyRepo: KeyRepository
+  private _keyRepo: IKeyRepository
   private _tokenController: TokensController
   private accessor baseUser: IUserEntity & Record<string, unknown> = {} as unknown as IUserEntity & Record<string, unknown>
   private accessor privateKey: string | null = null
@@ -23,7 +23,7 @@ export default class Tokens {
     this.baseUser._id = user._id as string
     this.baseUser.login = user.login
 
-    this._keyRepo = new KeyRepository(KeyModel)
+    this._keyRepo = KeyRepository.createInstance()
     this._tokenController = new TokensController(user._id as string);
   }
 
@@ -31,7 +31,7 @@ export default class Tokens {
     return this._tokenController
   }
 
-  private get keyRepo(): KeyRepository {
+  private get keyRepo(): IKeyRepository {
     return this._keyRepo
   }
 

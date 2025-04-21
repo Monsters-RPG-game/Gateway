@@ -195,7 +195,7 @@ export default [
             'jsdoc/sort-tags': 1,
             'jsdoc/tag-lines': 1,
             'jsdoc/valid-types': 1,
-            'max-classes-per-file': 2,
+            'max-classes-per-file': 0,
             'no-await-in-loop': 2,
             'no-bitwise': 2,
             'no-class-assign': 2,
@@ -313,17 +313,6 @@ export default [
                         '[accessor-pairs]',
                         '[getters]',
                         '[setters]',
-
-                        {
-                            type: 'method',
-                            name: '/^get.+$/',
-                            sort: 'alphabetical',
-                        },
-                        {
-                            type: 'method',
-                            name: '/^set.+$/',
-                            sort: 'alphabetical',
-                        },
 
                         '[static-properties]',
                         '[static-methods]',

@@ -1,20 +1,49 @@
-import AbstractRepository from '../../../tools/abstractions/repository.js';
+import Log from 'simpl-loggar';
+import MongoTokenRepository from './logic/mongo.js';
+import { NoRepositoryControllerSpecified } from '../../../errors/index.js';
+import getConfig from '../../../tools/configLoader.js';
+import Token from '../model.js';
+import type AddToken from './add.js';
 import type { ITokenEntity } from '../entity.js';
 import type { ITokenRepository } from './types.js';
-import type * as enums from '../../../enums/index.js';
-import type Token from '../model.js';
-import type { IToken } from '../types.js';
-import type { FilterQuery } from 'mongoose';
 
-export default class TokenRepository
-  extends AbstractRepository<IToken, typeof Token, enums.EModules.Token>
-  implements ITokenRepository
-{
+class TokenRepository implements ITokenRepository {
+  constructor(repository: ITokenRepository) {
+    this.repository = repository;
+  }
+
+  private accessor repository: ITokenRepository;
+
   async getByUserId(userId: string): Promise<ITokenEntity | null> {
-    return this.model.findOne({ userId } as FilterQuery<Record<string, string>>, null, { sort: { _id: -1 } }).lean();
+    return this.repository.getByUserId(userId);
+  }
+
+  async add(token: AddToken): Promise<string> {
+    return this.repository.add(token);
+  }
+
+  async get(id: string): Promise<ITokenEntity | null> {
+    return this.repository.get(id);
   }
 
   async removeByUserId(userId: string): Promise<void> {
-    await this.model.findOneAndDelete({ userId });
+    return this.repository.removeByUserId(userId);
   }
+}
+
+export default class TokenFacade {
+  static createInstance(): ITokenRepository {
+    const repositoryTarget = getConfig().repository;
+
+    switch (repositoryTarget) {
+      case 'mongo':
+        TokenFacade.instance = new TokenRepository(new MongoTokenRepository(Token));
+        return TokenFacade.instance;
+      default:
+        Log.error('No repository controller specified. Please specify type of controller in config files');
+        throw new NoRepositoryControllerSpecified();
+    }
+  }
+
+  private static accessor instance: ITokenRepository | undefined = undefined;
 }

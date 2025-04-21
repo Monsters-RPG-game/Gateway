@@ -7,18 +7,18 @@ import type RemoveAccountDto from './dto.js';
 import type ReqController from '../../../../connections/router/reqController.js';
 import type { IAbstractSubController } from '../../../../types/abstractions.js';
 import type { IResponse } from '../../../../types/requests.js';
-import type ClientsRepository from '../../../clients/repository/index.js';
-import type OidcClientsRepository from '../../../oidcClients/repository/index.js';
+import type { IClientRepository } from '../../../clients/repository/types.js';
+import type { IOidcClientRepository } from '../../../oidcClients/repository/types.js';
 import type express from 'express';
 
 export default class RemoveAccountController implements IAbstractSubController<void> {
-  constructor(clientsRepository: ClientsRepository, oidcClientsRepository: OidcClientsRepository) {
+  constructor(clientsRepository: IClientRepository, oidcClientsRepository: IOidcClientRepository) {
     this.oidcClientsRepository = oidcClientsRepository;
     this.clientsRepository = clientsRepository;
   }
 
-  private accessor oidcClientsRepository: OidcClientsRepository;
-  private accessor clientsRepository: ClientsRepository;
+  private accessor oidcClientsRepository: IOidcClientRepository;
+  private accessor clientsRepository: IClientRepository;
 
   async execute(data: RemoveAccountDto, req: express.Request, res: IResponse): Promise<void> {
     const client = await this.clientsRepository.getByName(data.client);

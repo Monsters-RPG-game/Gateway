@@ -1,17 +1,15 @@
 import { jwtVerify, SignJWT, importJWK } from 'jose';
 import Log from 'simpl-loggar';
-import TokenModel from './model.js';
 import AddToken from './repository/add.js';
 import TokenRepository from './repository/index.js';
 import { EClientGrants, ETTL, ETokenType } from '../../enums/index.js';
 import { InternalError, InvalidRequest } from '../../errors/index.js';
 import getConfig from '../../tools/configLoader.js';
 import State from '../../tools/state.js';
-import KeyModel from '../keys/model.js';
 import KeyRepository from '../keys/repository/index.js';
-import OidcClientModel from '../oidcClients/model.js';
 import OidcClientsRepository from '../oidcClients/repository/index.js';
 import type { ITokenEntity } from './entity.js';
+import type { ITokenRepository } from './repository/types.js';
 import type { IIntrospection, ISessionTokenData, ITokenData, IUserServerTokens } from '../../types/index.js';
 import type { IKeyEntity } from '../keys/entity.js';
 import type { IOidcClientEntity } from '../oidcClients/entity.js';
@@ -20,23 +18,23 @@ import { randomUUID, createHash } from 'crypto';
 
 export default class TokensController {
   private readonly _userId: string;
-  private readonly _repo: TokenRepository;
+  private readonly _repo: ITokenRepository;
 
   constructor(userId: string) {
     this._userId = userId;
-    this._repo = new TokenRepository(TokenModel);
+    this._repo = TokenRepository.createInstance();
   }
 
   private get userId(): string {
     return this._userId;
   }
 
-  private get repo(): TokenRepository {
+  private get repo(): ITokenRepository {
     return this._repo;
   }
 
   static async getKey(cookie: string): Promise<IKeyEntity> {
-    const repo = new KeyRepository(KeyModel);
+    const repo = KeyRepository.createInstance();
     const keys = (await repo.getAll()).map((k) => {
       return {
         ...k,
@@ -58,34 +56,6 @@ export default class TokensController {
     }
 
     return key;
-  }
-
-  private async getSigningKey(): Promise<IKeyEntity> {
-    const repo = new KeyRepository(KeyModel);
-    const keys = (await repo.getAll()).map((k) => {
-      return {
-        ...k,
-        kid: createHash('sha256').update(JSON.stringify(k)).digest('base64url'),
-      };
-    });
-
-    if (keys.length === 0) {
-      Log.error('Tokens controller', 'Missing keys!');
-      throw new InternalError();
-    }
-
-    return keys.sort((a, b) => {
-      const startA = new Date(a.createdAt);
-      const startB = new Date(b.createdAt);
-
-      if (startA > startB) return -1;
-      if (startB > startA) return 1;
-      return 0;
-    })[0]!;
-  }
-
-  getTokens(): Promise<ITokenEntity | null> {
-    return this.repo.getByUserId(this.userId);
   }
 
   static async validateToken(token: string): Promise<ITokenData> {
@@ -115,6 +85,34 @@ export default class TokensController {
     return parsed;
   }
 
+  private async getSigningKey(): Promise<IKeyEntity> {
+    const repo = KeyRepository.createInstance();
+    const keys = (await repo.getAll()).map((k) => {
+      return {
+        ...k,
+        kid: createHash('sha256').update(JSON.stringify(k)).digest('base64url'),
+      };
+    });
+
+    if (keys.length === 0) {
+      Log.error('Tokens controller', 'Missing keys!');
+      throw new InternalError();
+    }
+
+    return keys.sort((a, b) => {
+      const startA = new Date(a.createdAt);
+      const startB = new Date(b.createdAt);
+
+      if (startA > startB) return -1;
+      if (startB > startA) return 1;
+      return 0;
+    })[0]!;
+  }
+
+  getTokens(): Promise<ITokenEntity | null> {
+    return this.repo.getByUserId(this.userId);
+  }
+
   async addToken(tokens: IUserServerTokens): Promise<void> {
     const newToken = new AddToken({
       ttl: tokens.expires_in.toString(),
@@ -126,12 +124,11 @@ export default class TokensController {
   }
 
   async removeUserTokens(): Promise<void> {
-    const repo = new TokenRepository(TokenModel);
-    await repo.removeByUserId(this.userId);
+    await this.repo.removeByUserId(this.userId);
   }
 
   async checkRefreshToken(refreshToken: string): Promise<IIntrospection | null> {
-    const clientRepo = new OidcClientsRepository(OidcClientModel);
+    const clientRepo = OidcClientsRepository.createInstance();
     const client = await clientRepo.getByGrant(EClientGrants.AuthorizationCode);
     if (!client) throw new InvalidRequest();
 
@@ -238,8 +235,7 @@ export default class TokensController {
 
   async logoutOidc(): Promise<string> {
     const userTokens = await this.getTokens();
-    const clientRepo = new OidcClientsRepository(OidcClientModel);
-    const tokenRepo = new TokenRepository(TokenModel);
+    const clientRepo = OidcClientsRepository.createInstance();
 
     // Get one client - this should probably include some custom logic
     const client = await clientRepo.getByGrant(EClientGrants.AuthorizationCode);
@@ -257,7 +253,7 @@ export default class TokensController {
       client_id: client.clientId,
     }).toString();
 
-    await tokenRepo.removeByUserId(this.userId);
+    await this.repo.removeByUserId(this.userId);
 
     return `${server}/session/end?${params}`;
   }

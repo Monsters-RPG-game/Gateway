@@ -1,16 +1,16 @@
 import Log from 'simpl-loggar';
 import type Bootstrap from './bootstrap.js';
 import type Broker from '../connections/broker/index.js';
-import type Mongo from '../connections/mongo/index.js';
 import type Redis from '../connections/redis/index.js';
 import type Router from '../connections/router/index.js';
 import type WebsocketServer from '../connections/websocket/index.js';
 import type { IState } from '../types/index.js';
+import type { IMongoInstance } from 'connections/mongo/types.js';
 
 class State implements IState {
   private _router: Router | null = null;
   private _alive: boolean = false;
-  private _mongo: Mongo | null = null;
+  private _mongo: IMongoInstance | null = null;
   private _controllers: Bootstrap | null = null;
   private _redis: Redis | null = null;
   private _broker: Broker | null = null;
@@ -48,11 +48,11 @@ class State implements IState {
     this._alive = val;
   }
 
-  get mongo(): Mongo {
+  get mongo(): IMongoInstance {
     return this._mongo!;
   }
 
-  set mongo(value: Mongo) {
+  set mongo(value: IMongoInstance) {
     this._mongo = value;
   }
 

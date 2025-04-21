@@ -10,7 +10,7 @@ export interface IAddOidcClient {
 }
 
 export interface IOidcClientRepository {
-  add(user: AddOidcClient): Promise<string>;
+  add(client: AddOidcClient): Promise<string>;
   get(id: string): Promise<IOidcClientEntity | null>;
   getByGrant(grant: EClientGrants): Promise<IOidcClientEntity | null>;
   getByName(clientId: string): Promise<IOidcClientEntity | null>;

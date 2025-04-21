@@ -4,15 +4,15 @@ import { generateRandomName } from '../../../../utils/index.js';
 import type StartRegisterDto from './dto.js';
 import type { IAbstractSubController } from '../../../../types/abstractions.js';
 import type { IUserSession } from '../../../../types/user.js';
-import type ClientsRepository from '../../../clients/repository/index.js';
+import type { IClientRepository } from '../../../clients/repository/types.js';
 import type express from 'express';
 
 export default class StartRegisterController implements IAbstractSubController<string> {
-  constructor(repository: ClientsRepository) {
+  constructor(repository: IClientRepository) {
     this.repository = repository;
   }
 
-  private accessor repository: ClientsRepository;
+  private accessor repository: IClientRepository;
 
   async execute(data: StartRegisterDto, req: express.Request): Promise<string> {
     const client = await this.repository.getByName(data.client);

@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import Validation from '@monsters/validator';
 import type { IRemoveAccountDto, IRemoveUserAccountRequestDto } from './types.js';
 

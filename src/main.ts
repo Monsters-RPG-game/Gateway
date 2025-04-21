@@ -1,6 +1,6 @@
 import Log from 'simpl-loggar';
 import Broker from './connections/broker/index.js';
-import Mongo from './connections/mongo/index.js';
+import Mongo from './connections/mongo/factory.js';
 import Redis from './connections/redis/index.js';
 import Router from './connections/router/index.js';
 import WebsocketServer from './connections/websocket/index.js';
@@ -33,7 +33,7 @@ class App {
 
   private configLogger(): void {
     Log.setPrefix('monsters');
-    Log.setLokiTransporter(getConfig().metrics.loki);
+    if (process.env.NODE_ENV === 'production') Log.setLokiTransporter(getConfig().metrics.loki);
   }
 
   @Log.decorateTime('App initialized')
@@ -50,14 +50,15 @@ class App {
     State.broker = broker;
     State.socket = socket;
     State.redis = redis;
-    State.mongo = mongo;
+    State.mongo = await mongo.create();
+
+    await redis.init();
 
     controllers.init();
     await broker.init();
-    await redis.init();
-    await mongo.init();
     router.init();
     socket.init();
+
     Log.log('Server', 'Server started');
 
     this.liveness = new Liveness();
