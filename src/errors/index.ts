@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 export class FullError extends Error {
   code = '000';
   status = 500;
@@ -450,6 +449,41 @@ export class ActionNotAllowed extends FullError {
  * @openapi
  * components:
  *   schemas:
+ *     NoUserWithProvidedName:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Error name describing the error cause.
+ *           example: 'NoUserWithProvidedName'
+ *         code:
+ *           type: string
+ *           description: Unique code associated with the error.
+ *           example: '105'
+ *         message:
+ *           type: string
+ *           description: Error message describing the error cause.
+ *           example: "No user with provided name"
+ */
+export class NoUserWithProvidedName extends FullError {
+  constructor(names?: string[]) {
+    super(
+      names
+        ? names.length === 1
+          ? `User ${names.join(', ')} does not exist`
+          : `Users ${names.join(', ')} does not exist`
+        : 'No user with provided name',
+    );
+    this.name = 'NoUserWithProvidedName';
+    this.status = 400;
+    this.code = '016';
+  }
+}
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
  *     IncorrectBodyTypeError:
  *       type: object
  *       properties:
@@ -595,13 +629,13 @@ export class IncorrectCredentialsError extends FullError {
  * @openapi
  * components:
  *   schemas:
- *     NoUserWithProvidedName:
+ *     NoRepositoryControllerSpecified:
  *       type: object
  *       properties:
  *         name:
  *           type: string
  *           description: Error name describing the error cause.
- *           example: 'NoUserWithProvidedName'
+ *           example: 'NoRepositoryControllerSpecified'
  *         code:
  *           type: string
  *           description: Unique code associated with the error.
@@ -609,20 +643,14 @@ export class IncorrectCredentialsError extends FullError {
  *         message:
  *           type: string
  *           description: Error message describing the error cause.
- *           example: "No user with provided name"
+ *           example: "No repository controller specified"
  */
-export class NoUserWithProvidedName extends FullError {
-  constructor(names?: string[]) {
-    super(
-      names
-        ? names.length === 1
-          ? `User ${names.join(', ')} does not exist`
-          : `Users ${names.join(', ')} does not exist`
-        : 'No user with provided name',
-    );
-    this.name = 'NoUserWithProvidedName';
-    this.status = 400;
-    this.code = '016';
+export class NoRepositoryControllerSpecified extends FullError {
+  constructor() {
+    super('No repository controller specified');
+    this.name = 'NoRepositoryControllerSpecified';
+    this.code = '105';
+    this.status = 500;
   }
 }
 

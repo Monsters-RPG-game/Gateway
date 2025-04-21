@@ -1,5 +1,3 @@
-import ClientModel from '../clients/model.js';
-import OidcClientModel from '../oidcClients/model.js';
 import DebugController from './subModules/debug/index.js';
 import RefreshTokenController from './subModules/refreshToken/index.js';
 import RemoveAccountController from './subModules/removeAccount/index.js';
@@ -21,8 +19,8 @@ export default class UsersController extends AbstractController<enums.EControlle
    * @returns Void.
    */
   protected init(): void {
-    const oidcClientRepo = new OidcClientsRepository(OidcClientModel);
-    const clientRepo = new ClientsRepository(ClientModel);
+    const oidcClientRepo = OidcClientsRepository.createInstance();
+    const clientRepo = ClientsRepository.createInstance();
 
     this.register(enums.EUserActions.Debug, new DebugController());
     this.register(enums.EUserActions.StartRegister, new RegisterController(clientRepo));

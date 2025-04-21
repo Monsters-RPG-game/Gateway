@@ -17,4 +17,5 @@ export interface IConfigInterface {
   metrics: {
     loki: string;
   };
+  repository: string;
 }

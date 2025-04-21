@@ -1,6 +1,5 @@
 import { exportJWK, generateKeyPair } from 'jose';
 import Log from 'simpl-loggar';
-import KeyModel from './model.js';
 import AddKey from './repository/add.js';
 import KeysRepository from './repository/index.js';
 import type { JWK } from 'jose';
@@ -18,7 +17,7 @@ export default class Keys {
   }
 
   private async create(amount: number): Promise<string[]> {
-    const repo = new KeysRepository(KeyModel);
+    const repo = KeysRepository.createInstance();
     const actions: (() => Promise<string>)[] = [];
 
     for (let i = 0; i < amount; i++) {

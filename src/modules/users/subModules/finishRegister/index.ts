@@ -6,15 +6,15 @@ import type FinishRegisterDto from './dto.ts';
 import type { IAbstractSubController } from '../../../../types/abstractions.js';
 import type { IResponse } from '../../../../types/requests.js';
 import type { IUserSession } from '../../../../types/user.js';
-import type ClientsRepository from '../../../clients/repository/index.js';
+import type { IClientRepository } from '../../../clients/repository/types.js';
 import type express from 'express';
 
 export default class FinishRegisterController implements IAbstractSubController<string> {
-  constructor(repository: ClientsRepository) {
+  constructor(repository: IClientRepository) {
     this.repository = repository;
   }
 
-  private accessor repository: ClientsRepository;
+  private accessor repository: IClientRepository;
 
   async execute(data: FinishRegisterDto, req: express.Request, res: IResponse): Promise<string> {
     const { nonce } = req.session as IUserSession;

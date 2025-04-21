@@ -8,7 +8,7 @@ export interface IAddClient {
 }
 
 export interface IClientRepository {
-  add(user: AddClient): Promise<string>;
+  add(client: AddClient): Promise<string>;
   get(id: string): Promise<IClientEntity | null>;
   getByName(clientId: string): Promise<IClientEntity | null>;
 }

@@ -14,7 +14,8 @@ export interface IAddKey {
 }
 
 export interface IKeyRepository {
-  add(user: AddKey): Promise<string>;
+  add(key: AddKey): Promise<string>;
   get(id: string): Promise<IKeyEntity | null>;
   getAll(): Promise<IKeyEntity[]>;
+  remove(_id: string): Promise<void>;
 }

@@ -15,23 +15,23 @@ import type {
   IAbstractSubController,
   IResponse,
 } from '../../../../types/index.js';
-import type ClientsRepository from '../../../clients/repository/index.js';
-import type OidcClientsRepository from '../../../oidcClients/repository/index.js';
+import type { IClientRepository } from '../../../clients/repository/types.js';
 import type express from 'express';
 import type { JWK } from 'jose';
+import type { IOidcClientRepository } from 'modules/oidcClients/repository/types.js';
 import type mongoose from 'mongoose';
 
 export default class LoginController
   implements
     IAbstractSubController<{ url: string; accessToken: string; refreshToken: string; sessionToken: string } | string>
 {
-  constructor(clientsRepository: ClientsRepository, oidcClientsRepository: OidcClientsRepository) {
+  constructor(clientsRepository: IClientRepository, oidcClientsRepository: IOidcClientRepository) {
     this.clientsRepository = clientsRepository;
     this.oidcClientRepository = oidcClientsRepository;
   }
 
-  private accessor oidcClientRepository: OidcClientsRepository;
-  private accessor clientsRepository: ClientsRepository;
+  private accessor oidcClientRepository: IOidcClientRepository;
+  private accessor clientsRepository: IClientRepository;
 
   async execute(
     data: LoginDto,

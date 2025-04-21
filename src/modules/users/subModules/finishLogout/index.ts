@@ -3,15 +3,15 @@ import { InvalidRequest } from '../../../../errors/index.js';
 import TokensController from '../../../tokens/index.js';
 import type { IAbstractSubController } from '../../../../types/abstractions.js';
 import type { IUserSession } from '../../../../types/user.js';
-import type ClientsRepository from '../../../clients/repository/index.js';
+import type { IClientRepository } from '../../../clients/repository/types.js';
 import type express from 'express';
 
 export default class FinishLogoutController implements IAbstractSubController<string> {
-  constructor(repository: ClientsRepository) {
+  constructor(repository: IClientRepository) {
     this.repository = repository;
   }
 
-  private accessor repository: ClientsRepository;
+  private accessor repository: IClientRepository;
 
   async execute(req: express.Request): Promise<string> {
     const { client } = req.session as IUserSession;

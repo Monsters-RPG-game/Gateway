@@ -16,5 +16,6 @@
   },
   "metrics": {
     "loki": "loki address"
-  }
+  },
+  "repository": "mongo"
 }
