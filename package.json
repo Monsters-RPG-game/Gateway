@@ -43,7 +43,7 @@
     "express-session": "1.18.1",
     "helmet": "^8.0.0",
     "jose": "^6.0.7",
-    "mongoose": "8.12.1",
+    "mongoose": "8.15.1",
     "redis": "^4.7.0",
     "simpl-loggar": "^0.7.0",
     "swagger-jsdoc": "6.2.8",
