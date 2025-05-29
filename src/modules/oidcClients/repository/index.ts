@@ -24,7 +24,7 @@ class OidcClientsRepository implements IOidcClientRepository {
   }
 
   async getByGrant(grant: EClientGrants): Promise<IOidcClientEntity | null> {
-    return this.repository.get(grant);
+    return this.repository.getByGrant(grant);
   }
 
   async getByName(clientId: string): Promise<IOidcClientEntity | null> {
