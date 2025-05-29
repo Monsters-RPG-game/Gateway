@@ -12,7 +12,7 @@ class Mongo implements IMongoInstance {
       dbName: 'Gateway',
       serverSelectionTimeoutMS: 5000,
     } as ConnectOptions);
-    Log.log('Mongo', 'Started server');
+    Log.log('Mongo', 'Connected');
   }
 
   disconnect(): void {
