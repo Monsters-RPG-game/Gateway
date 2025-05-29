@@ -112,6 +112,7 @@ export default [
                 },
             ],
 
+            'complexity': 2,
             'consistent-return': 2,
             'default-case': 2,
             'default-case-last': 2,
@@ -292,7 +293,7 @@ export default [
             'prefer-template': 2,
             'prettier/prettier': 2,
             'require-atomic-updates': 0,
-            'require-unicode-regexp': 2,
+            'require-unicode-regexp': 0,
             'require-yield': 2,
             'sort-class-members/sort-class-members': [
                 2,

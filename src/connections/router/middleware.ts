@@ -60,9 +60,7 @@ export default class Middleware {
       // Validate if profile is initialized
       let user = await State.redis.getCachedUser(res.locals.user!._id);
 
-      if (!user) {
-        user = await Middleware.fetchUserProfile(res.locals.user!._id);
-      }
+      user ??= await Middleware.fetchUserProfile(res.locals.user!._id);
 
       res.locals.profile = user.profile;
       res.locals.user = user.account as { _id: string; login: string };
@@ -157,6 +155,9 @@ export default class Middleware {
     // Log new req
     app.use((req, _res, next) => {
       try {
+        const notLog: string[] = ['/metrics', '/health'];
+        if (notLog.includes(req.path)) return;
+
         const logBody: Record<string, string | Record<string, string>> = {
           method: req.method,
           path: req.path,

@@ -17,10 +17,10 @@ export default class Repository {
     return this.client.get(target);
   }
 
-  async getFromHash(data: { target: enums.ERedisTargets | string; value: string }): Promise<string | undefined> {
+  async getFromHash(data: { target: enums.ERedisTargets | string; value: string }): Promise<string | null> {
     const { target, value } = data;
     const exist = await this.checkElm(target);
-    if (!exist) return undefined;
+    if (!exist) return null;
     return this.client.hGet(target, value);
   }
 

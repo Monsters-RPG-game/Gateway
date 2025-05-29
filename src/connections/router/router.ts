@@ -70,7 +70,7 @@ export default class AppRouter {
   }
 
   initFourOhFour(app: express.Express): void {
-    app.all('*', (_req, res) => {
+    app.all(/(.*)/, (_req, res) => {
       const { status, code, message, name } = new FourOhFour();
 
       res.status(status).send({
