@@ -9,7 +9,7 @@
       "alwaysStrict": true,
       "baseUrl": "./src",
       "checkJs": false,
-      "declaration": true,
+      "declaration": false,
       "declarationMap": false,
       "disableReferencedProjectLoad": true,
       "disableSolutionSearching": false,
