@@ -2,7 +2,7 @@ import Log from 'simpl-loggar';
 import migrations from './actions/index.js';
 import MongoConnection from './connection.js';
 import getModel from './model.js';
-import type { IMigration, IMigrationFile } from './types.js';
+import type { IMigrationFile } from './types.js';
 import type { Connection } from 'mongoose';
 
 export default class Migrations {
@@ -29,7 +29,7 @@ export default class Migrations {
     const Model = getModel(this.migrationClient as Connection);
     const entry = await Model.find({ dbName: 'Gateway' });
 
-    return !entry || entry.length === 0 ? [] : (entry[0] as IMigration).changes;
+    return entry.map((e) => e.changes).flat();
   }
 
   async init(): Promise<void> {
