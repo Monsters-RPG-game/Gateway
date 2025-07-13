@@ -64,7 +64,7 @@ export default class LoginController
     (req.session as IUserSession).client = client.clientId;
     (req.session as IUserSession).verifier = verifier;
 
-    const oidcClient = await this.oidcClientRepository.getByGrant(EClientGrants.AuthorizationCode);
+    const oidcClient = await this.oidcClientRepository.getByName(data.client!);
 
     Log.debug('Login', `Using client ${EClientGrants.AuthorizationCode} to send user to login page`, oidcClient);
     if (!oidcClient) throw new InvalidRequest();
@@ -114,11 +114,14 @@ export default class LoginController
   ): Promise<{ userId: string; tokenController: TokenController; refreshToken: string }> {
     const verifier = (req.session as IUserSession).verifier!;
 
+    const userClient = (req.session as IUserSession).client;
+    if (!userClient) throw new InvalidRequest();
+
     delete (req.session as IUserSession).verifier;
     delete (req.session as IUserSession).nonce;
 
     // Get one client - this should probably include some custom logic
-    const oidcClient = await this.oidcClientRepository.getByGrant(EClientGrants.AuthorizationCode);
+    const oidcClient = await this.oidcClientRepository.getByName(userClient);
 
     Log.debug('Login', `Using oidc client ${EClientGrants.AuthorizationCode} to get tokens`, oidcClient);
     if (!oidcClient) throw new InvalidRequest();
@@ -138,7 +141,7 @@ export default class LoginController
       body,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Access-Control-Allow-Origin': 'http://localhost:5004',
+        'Access-Control-Allow-Origin': getConfig().myAddress,
       },
     });
 
@@ -179,7 +182,7 @@ export default class LoginController
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'http://localhost:5004',
+        'Access-Control-Allow-Origin': getConfig().myAddress,
       },
     });
 
