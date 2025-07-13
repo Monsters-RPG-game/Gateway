@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "@monsters/metrics": "github:Monsters-RPG-game/Packages-metrics",
+    "@monsters/utils": "github:Monsters-RPG-game/Packages-utils",
     "@monsters/validator": "github:Monsters-RPG-game/Packages-validator",
     "amqplib": "0.10.8",
     "cookie-parser": "1.4.7",
