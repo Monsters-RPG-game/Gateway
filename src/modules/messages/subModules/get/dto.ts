@@ -18,14 +18,14 @@ export default class GetMessagesDto implements IGetMessagesDto {
   target: string | undefined;
 
   constructor(data: IGetMessagesDto) {
-    this.page = data.page ?? 1;
+    this.page = data.page ? parseInt((data.page ?? '').toString()) : 1;
     this.target = data.target;
 
     this.validate();
   }
 
   validate(): void {
-    new Validation(this.page, 'page').isDefined();
+    new Validation(this.page, 'page').isDefined().isNumber();
     if (this.target) new Validation(this.target, 'target').isDefined();
   }
 }
