@@ -2,7 +2,7 @@ import express from 'express';
 import Log from 'simpl-loggar';
 import Middleware from './middleware.js';
 import AppRouter from './router.js';
-import getConfig from '../../tools/configLoader.js';
+import ConfigLoader from '../../tools/config/index.js';
 import http from 'http';
 
 export default class Router {
@@ -121,8 +121,8 @@ export default class Router {
 
     if (process.env.NODE_ENV === 'test') return;
 
-    this.server.listen(getConfig().httpPort, () => {
-      Log.log('Server', `Listening on ${getConfig().httpPort}`);
+    this.server.listen(ConfigLoader.getConfig().httpPort, () => {
+      Log.log('Server', `Listening on ${ConfigLoader.getConfig().httpPort}`);
     });
   }
 }

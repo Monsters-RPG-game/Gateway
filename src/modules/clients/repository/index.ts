@@ -1,7 +1,7 @@
 import Log from 'simpl-loggar';
 import MongoClientsRepository from './logic/mongo.js';
 import { NoRepositoryControllerSpecified } from '../../../errors/index.js';
-import getConfig from '../../../tools/configLoader.js';
+import ConfigLoader from '../../../tools/config/index.js';
 import Client from '../model.js';
 import type AddClient from './add.js';
 import type { IClientRepository } from './types.js';
@@ -29,7 +29,7 @@ class ClientsRepository implements IClientRepository {
 
 export default class KeysFacade {
   static createInstance(): IClientRepository {
-    const repositoryTarget = getConfig().repository;
+    const repositoryTarget = ConfigLoader.getConfig().repository;
 
     switch (repositoryTarget) {
       case 'mongo':

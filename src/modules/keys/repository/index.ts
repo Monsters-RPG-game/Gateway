@@ -1,7 +1,7 @@
 import Log from 'simpl-loggar';
 import MongoKeysRepository from './logic/mongo.js';
 import { NoRepositoryControllerSpecified } from '../../../errors/index.js';
-import getConfig from '../../../tools/configLoader.js';
+import ConfigLoader from '../../../tools/config/index.js';
 import Key from '../model.js';
 import type AddKey from './add.js';
 import type { IKeyRepository } from './types.js';
@@ -33,7 +33,7 @@ class KeysRepository implements IKeyRepository {
 
 export default class KeysFacade {
   static createInstance(): IKeyRepository {
-    const repositoryTarget = getConfig().repository;
+    const repositoryTarget = ConfigLoader.getConfig().repository;
 
     switch (repositoryTarget) {
       case 'mongo':

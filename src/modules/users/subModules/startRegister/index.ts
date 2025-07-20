@@ -1,5 +1,5 @@
 import { InvalidRequest } from '../../../../errors/index.js';
-import getConfig from '../../../../tools/configLoader.js';
+import ConfigLoader from '../../../../tools/config/index.js';
 import { generateRandomName } from '../../../../utils/index.js';
 import type StartRegisterDto from './dto.js';
 import type { IAbstractSubController } from '../../../../types/abstractions.js';
@@ -27,11 +27,11 @@ export default class StartRegisterController implements IAbstractSubController<s
 
     const params = new URLSearchParams({
       client_id: 'register',
-      redirect_url: `${getConfig().myAddress}/user/register/finish`,
+      redirect_url: `${ConfigLoader.getConfig().myAddress}/user/register/finish`,
       home: client.failUrl,
       nonce,
     });
 
-    return `${getConfig().authorizationAddress}/register?${params.toString()}`;
+    return `${ConfigLoader.getConfig().authorizationAddress}/register?${params.toString()}`;
   }
 }

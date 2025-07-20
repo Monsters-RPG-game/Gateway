@@ -658,6 +658,35 @@ export class NoRepositoryControllerSpecified extends FullError {
  * @openapi
  * components:
  *   schemas:
+ *     FourOhFour:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: Error name describing the error cause.
+ *           example: 'InvalidConfigError'
+ *         code:
+ *           type: string
+ *           description: Unique code associated with the error.
+ *           example: '017'
+ *         message:
+ *           type: string
+ *           description: Error message describing the error cause.
+ *           example: "Config file is missing, cannot be read or is malformed"
+ */
+export class InvalidConfigError extends FullError {
+  constructor(message?: string) {
+    super(message ?? 'Config file is missing, cannot be read or is malformed')
+    this.code = '017';
+    this.status = 500;
+    this.name = 'InvalidConfigError';
+  }
+}
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
  *     MissingMessageError:
  *       type: object
  *       properties:

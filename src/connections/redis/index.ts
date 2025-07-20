@@ -3,7 +3,7 @@ import Log from 'simpl-loggar';
 import RedisKeys from './keys.js';
 import Repository from './repository.js';
 import * as enums from '../../enums/index.js';
-import getConfig from '../../tools/configLoader.js';
+import ConfigLoader from '../../tools/config/index.js';
 import type { IProfileEntity } from '../../modules/profile/entity.js';
 import type { IUserEntity } from '../../modules/users/entity.js';
 import type { ICachedUser, IFullError, IUserSession, ISessionTokenData } from '../../types/index.js';
@@ -218,7 +218,7 @@ export default class Redis {
 
   private initClient(): void {
     this._client = createClient({
-      url: getConfig().redisURL,
+      url: ConfigLoader.getConfig().redisURL,
     });
   }
 

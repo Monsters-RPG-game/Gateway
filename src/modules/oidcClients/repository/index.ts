@@ -1,7 +1,7 @@
 import Log from 'simpl-loggar';
 import MongoOidcClientRepository from './logic/mongo.js';
 import { NoRepositoryControllerSpecified } from '../../../errors/index.js';
-import getConfig from '../../../tools/configLoader.js';
+import ConfigLoader from '../../../tools/config/index.js';
 import OidcClient from '../model.js';
 import type AddOidcClient from './add.js';
 import type { IOidcClientEntity } from '../entity.js';
@@ -34,7 +34,7 @@ class OidcClientsRepository implements IOidcClientRepository {
 
 export default class OidcClientFacade {
   static createInstance(): IOidcClientRepository {
-    const repositoryTarget = getConfig().repository;
+    const repositoryTarget = ConfigLoader.getConfig().repository;
 
     switch (repositoryTarget) {
       case 'mongo':

@@ -3,7 +3,7 @@ import Log from 'simpl-loggar';
 import Controller from './controller.js';
 import * as enums from '../../enums/index.js';
 import { InternalError } from '../../errors/index.js';
-import getConfig from '../../tools/configLoader.js';
+import ConfigLoader from '../../tools/config/index.js';
 import { generateRandomName, sleep } from '../../utils/index.js';
 import type Communicator from './controller.js';
 import type { IHealth } from '../../modules/health/subModules/get/types.js';
@@ -129,7 +129,7 @@ export default class Broker {
     }
 
     try {
-      const connection = await amqplib.connect(getConfig().amqpURL);
+      const connection = await amqplib.connect(ConfigLoader.getConfig().amqpURL);
 
       Log.log('Rabbit', 'Connected to rabbit');
       this._connection = connection;

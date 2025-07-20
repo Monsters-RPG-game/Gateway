@@ -2,7 +2,7 @@ import Log from 'simpl-loggar';
 import Router from './index.js';
 import { EControllers, ETTL, ETokens, EUserActions } from '../../../../../enums/index.js';
 import handleErr from '../../../../../errors/handler.js';
-import getConfig from '../../../../../tools/configLoader.js';
+import ConfigLoader from '../../../../../tools/config/index.js';
 import { limitRate } from '../../../utils/index.js';
 import type { ILoginReq } from './types.js';
 import type * as types from '../../../../../types/index.js';
@@ -24,12 +24,12 @@ export default (): Router => {
       }
 
       const options: CookieOptions = {
-        httpOnly: getConfig().session.secured ? true : false,
-        secure: getConfig().session.secured ? true : false,
-        sameSite: getConfig().session.secured ? true : false,
+        httpOnly: ConfigLoader.getConfig().session.secured ? true : false,
+        secure: ConfigLoader.getConfig().session.secured ? true : false,
+        sameSite: ConfigLoader.getConfig().session.secured ? true : false,
       };
-      if (getConfig().tokens.domain) {
-        options.domain = getConfig().myDomain;
+      if (ConfigLoader.getConfig().tokens.domain) {
+        options.domain = ConfigLoader.getConfig().myDomain;
       }
       const accessOptions: CookieOptions = {
         ...options,

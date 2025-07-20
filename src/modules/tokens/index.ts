@@ -4,7 +4,7 @@ import AddToken from './repository/add.js';
 import TokenRepository from './repository/index.js';
 import { EClientGrants, ETTL, ETokenType } from '../../enums/index.js';
 import { InternalError, InvalidRequest } from '../../errors/index.js';
-import getConfig from '../../tools/configLoader.js';
+import ConfigLoader from '../../tools/config/index.js';
 import State from '../../tools/state.js';
 import KeyRepository from '../keys/repository/index.js';
 import OidcClientsRepository from '../oidcClients/repository/index.js';
@@ -138,11 +138,11 @@ export default class TokensController {
       token: refreshToken,
     });
 
-    const res = await fetch(`${getConfig().authorizationInnerAddress}/token/introspection`, {
+    const res = await fetch(`${ConfigLoader.getConfig().authorizationInnerAddress}/token/introspection`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Access-Control-Allow-Origin': getConfig().myAddress,
+        'Access-Control-Allow-Origin': ConfigLoader.getConfig().myAddress,
       },
       body,
     });
@@ -246,7 +246,7 @@ export default class TokensController {
       await this.revokeToken(userTokens.accessToken, ETokenType.Access, client);
     }
 
-    const server = getConfig().authorizationAddress;
+    const server = ConfigLoader.getConfig().authorizationAddress;
 
     const params = new URLSearchParams({
       post_logout_redirect_uri: client.redirectLogoutUrl,
@@ -300,8 +300,8 @@ export default class TokensController {
       client_secret: client.clientSecret,
     });
 
-    const homeUrl = getConfig().myAddress;
-    const res = await fetch(`${getConfig().authorizationInnerAddress}/token/revocation`, {
+    const homeUrl = ConfigLoader.getConfig().myAddress;
+    const res = await fetch(`${ConfigLoader.getConfig().authorizationInnerAddress}/token/revocation`, {
       method: 'POST',
       body,
       headers: {

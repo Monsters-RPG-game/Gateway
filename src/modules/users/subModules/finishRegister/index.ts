@@ -1,7 +1,7 @@
 import Log from 'simpl-loggar';
 import { RegisterRequestDto } from './dto.js';
 import { InvalidRequest } from '../../../../errors/index.js';
-import getConfig from '../../../../tools/configLoader.js';
+import ConfigLoader from '../../../../tools/config/index.js';
 import type FinishRegisterDto from './dto.ts';
 import type { IAbstractSubController } from '../../../../types/abstractions.js';
 import type { IResponse } from '../../../../types/requests.js';
@@ -39,12 +39,12 @@ export default class FinishRegisterController implements IAbstractSubController<
     });
 
     const res = await fetch(
-      `${getConfig().authorizationInnerAddress}/interaction/register/verify/${nonce}?${params.toString()}`,
+      `${ConfigLoader.getConfig().authorizationInnerAddress}/interaction/register/verify/${nonce}?${params.toString()}`,
       {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': getConfig().myAddress,
+          'Access-Control-Allow-Origin': ConfigLoader.getConfig().myAddress,
         },
       },
     );

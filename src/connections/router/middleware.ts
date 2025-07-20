@@ -11,7 +11,7 @@ import handleErr from '../../errors/handler.js';
 import * as errors from '../../errors/index.js';
 import GetProfileDto from '../../modules/profile/subModules/get/dto.js';
 import UserDetailsDto from '../../modules/users/subModules/details/dto.js';
-import getConfig from '../../tools/configLoader.js';
+import ConfigLoader from '../../tools/config/index.js';
 import State from '../../tools/state.js';
 import type { IProfileEntity } from '../../modules/profile/entity.js';
 import type { IUserEntity } from '../../modules/users/entity.js';
@@ -101,16 +101,16 @@ export default class Middleware {
     app.use(express.json({ limit: '10kb' }));
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
-    if (getConfig().session.trustProxy) app.set('trust proxy', 1);
+    if (ConfigLoader.getConfig().session.trustProxy) app.set('trust proxy', 1);
     app.use(
       cors({
-        origin: getConfig().corsOrigin,
+        origin: ConfigLoader.getConfig().corsOrigin,
         credentials: true,
       }),
     );
 
     const helmetDirectives = helmet.contentSecurityPolicy.getDefaultDirectives();
-    const allowedUrls = getConfig().corsOrigin;
+    const allowedUrls = ConfigLoader.getConfig().corsOrigin;
     app.use(
       helmet({
         contentSecurityPolicy: {
@@ -138,12 +138,12 @@ export default class Middleware {
     app.use(
       session({
         store: new SessionStore(),
-        secret: getConfig().session.secret,
+        secret: ConfigLoader.getConfig().session.secret,
         resave: false,
         rolling: true,
         saveUninitialized: true,
         cookie: {
-          secure: getConfig().session.secured,
+          secure: ConfigLoader.getConfig().session.secured,
           httpOnly: true,
           maxAge: 60 * 15 * 1000,
           sameSite: true,
