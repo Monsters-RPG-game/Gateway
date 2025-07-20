@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import Log from 'simpl-loggar';
-import getConfig from '../../tools/configLoader.js';
+import ConfigLoader from '../../tools/config/index.js';
 import State from '../../tools/state.js';
 import type { IMongoInstance } from './types.js';
 import type { ConnectOptions } from 'mongoose';
@@ -11,7 +11,7 @@ class Mongo implements IMongoInstance {
       Log.debug('Mongo', 'Connecting to mongo');
 
       mongoose
-        .connect(getConfig().mongoURL, {
+        .connect(ConfigLoader.getConfig().mongoURL, {
           dbName: 'Gateway',
           serverSelectionTimeoutMS: 5000,
         } as ConnectOptions)

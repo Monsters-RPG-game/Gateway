@@ -3,7 +3,7 @@ import { EControllers, EUserActions } from '../../../../../enums/controllers.js'
 import { ETokens } from '../../../../../enums/tokens.js';
 import { ETTL } from '../../../../../enums/ttl.js';
 import handleErr from '../../../../../errors/handler.js';
-import getConfig from '../../../../../tools/configLoader.js';
+import ConfigLoader from '../../../../../tools/config/index.js';
 import { limitRate, sendResponse } from '../../../utils/index.js';
 import type * as types from '../../../../../types/index.js';
 import type express from 'express';
@@ -21,16 +21,16 @@ export default (): Router => {
       const token = await service.execute(req, res);
       const options: CookieOptions = {
         maxAge: ETTL.UserAccessToken * 1000,
-        httpOnly: getConfig().session.secured ? true : false,
-        secure: getConfig().session.secured ? true : false,
-        sameSite: getConfig().session.secured ? true : false,
+        httpOnly: ConfigLoader.getConfig().session.secured ? true : false,
+        secure: ConfigLoader.getConfig().session.secured ? true : false,
+        sameSite: ConfigLoader.getConfig().session.secured ? true : false,
       };
       const accessOptions: CookieOptions = {
         ...options,
         maxAge: ETTL.UserAccessToken * 1000,
       };
-      if (getConfig().tokens.domain) {
-        options.domain = getConfig().myDomain;
+      if (ConfigLoader.getConfig().tokens.domain) {
+        options.domain = ConfigLoader.getConfig().myDomain;
       }
 
       if (typeof token === 'string') {

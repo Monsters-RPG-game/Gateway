@@ -5,7 +5,7 @@ import * as enums from '../../enums/index.js';
 import * as errors from '../../errors/index.js';
 import GetProfileDto from '../../modules/profile/subModules/get/dto.js';
 import UserDetailsDto from '../../modules/users/subModules/details/dto.js';
-import getConfig from '../../tools/configLoader.js';
+import ConfigLoader from '../../tools/config/index.js';
 import State from '../../tools/state.js';
 import ReqController from '../router/reqController.js';
 import type * as types from './types/index.js';
@@ -38,9 +38,9 @@ export default class WebsocketServer {
 
   init(): void {
     this.server = new WebSocketServer({
-      port: getConfig().socketPort,
+      port: ConfigLoader.getConfig().socketPort,
     });
-    Log.log('Socket', `Started socket on port ${getConfig().socketPort}`);
+    Log.log('Socket', `Started socket on port ${ConfigLoader.getConfig().socketPort}`);
     this.startListeners();
     this.startHeartbeat();
   }

@@ -5,7 +5,7 @@ import Redis from './connections/redis/index.js';
 import Router from './connections/router/index.js';
 import WebsocketServer from './connections/websocket/index.js';
 import Bootstrap from './tools/bootstrap.js';
-import getConfig from './tools/configLoader.js';
+import ConfigLoader from './tools/config/index.js';
 import Liveness from './tools/liveness.js';
 import State from './tools/state.js';
 import type { IFullError } from './types/index.js';
@@ -33,7 +33,7 @@ class App {
 
   private configLogger(): void {
     Log.setPrefix('monsters');
-    if (process.env.NODE_ENV === 'production') Log.setLokiTransporter(getConfig().metrics.loki);
+    if (process.env.NODE_ENV === 'production') Log.setLokiTransporter(ConfigLoader.getConfig().metrics.loki);
   }
 
   @Log.decorateTime('App initialized')

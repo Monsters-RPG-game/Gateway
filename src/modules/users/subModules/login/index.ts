@@ -2,7 +2,7 @@ import { jwtVerify } from 'jose';
 import Log from 'simpl-loggar';
 import { EClientGrants } from '../../../../enums/index.js';
 import { InvalidRequest } from '../../../../errors/index.js';
-import getConfig from '../../../../tools/configLoader.js';
+import ConfigLoader from '../../../../tools/config/index.js';
 import { generateCodeChallengeFromVerifier, generateCodeVerifier } from '../../../../tools/crypt.js';
 import { generateRandomName } from '../../../../utils/index.js';
 import TokenController from '../../../tokens/index.js';
@@ -71,7 +71,7 @@ export default class LoginController
 
     const params = new URLSearchParams({
       client_id: oidcClient.clientId,
-      redirect_url: `${getConfig().myAddress}/user/login`,
+      redirect_url: `${ConfigLoader.getConfig().myAddress}/user/login`,
       nonce,
       response_type: 'code',
       scope: 'openid',
@@ -79,7 +79,7 @@ export default class LoginController
       code_challenge: challenge,
     });
 
-    return `${getConfig().authorizationAddress}/auth?${params.toString()}`;
+    return `${ConfigLoader.getConfig().authorizationAddress}/auth?${params.toString()}`;
   }
 
   private async createTokens(
@@ -136,12 +136,12 @@ export default class LoginController
     });
 
     Log.debug('Login', 'Sending token req', body.toString());
-    const res = await fetch(`${getConfig().authorizationInnerAddress}/token`, {
+    const res = await fetch(`${ConfigLoader.getConfig().authorizationInnerAddress}/token`, {
       method: 'POST',
       body,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Access-Control-Allow-Origin': getConfig().myAddress,
+        'Access-Control-Allow-Origin': ConfigLoader.getConfig().myAddress,
       },
     });
 
@@ -178,11 +178,11 @@ export default class LoginController
   }
 
   private async fetchCerts(): Promise<JWK[]> {
-    const res = await fetch(`${getConfig().authorizationInnerAddress}/certs`, {
+    const res = await fetch(`${ConfigLoader.getConfig().authorizationInnerAddress}/certs`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': getConfig().myAddress,
+        'Access-Control-Allow-Origin': ConfigLoader.getConfig().myAddress,
       },
     });
 

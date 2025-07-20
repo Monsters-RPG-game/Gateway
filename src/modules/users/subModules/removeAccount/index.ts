@@ -1,7 +1,7 @@
 import Log from 'simpl-loggar';
 import { EClientGrants, ETokens } from '../../../../enums/index.js';
 import { InvalidRequest } from '../../../../errors/index.js';
-import getConfig from '../../../../tools/configLoader.js';
+import ConfigLoader from '../../../../tools/config/index.js';
 import TokensController from '../../../tokens/index.js';
 import type RemoveAccountDto from './dto.js';
 import type ReqController from '../../../../connections/router/reqController.js';
@@ -47,11 +47,11 @@ export default class RemoveAccountController implements IAbstractSubController<v
       access: tokens.accessToken,
     });
 
-    const res = await fetch(`${getConfig().authorizationInnerAddress}/interaction/account`, {
+    const res = await fetch(`${ConfigLoader.getConfig().authorizationInnerAddress}/interaction/account`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': getConfig().myAddress,
+        'Access-Control-Allow-Origin': ConfigLoader.getConfig().myAddress,
       },
       body,
     });
