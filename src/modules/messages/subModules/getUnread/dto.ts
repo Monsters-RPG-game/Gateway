@@ -17,12 +17,12 @@ export default class GetUnreadMessagesDto implements IGetUnreadMessagesDto {
   page: number;
 
   constructor(data: IGetUnreadMessagesDto) {
-    this.page = data.page;
+    this.page = parseInt((data.page ?? '').toString());
 
     this.validate();
   }
 
   validate(): void {
-    new Validation(this.page, 'page').isDefined();
+    new Validation(this.page, 'page').isDefined().isNumber();
   }
 }
