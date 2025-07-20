@@ -17,7 +17,7 @@ export default class GetUnreadMessagesDto implements IGetUnreadMessagesDto {
   page: number;
 
   constructor(data: IGetUnreadMessagesDto) {
-    this.page = parseInt((data.page ?? '').toString());
+    this.page = data.page ? parseInt((data.page ?? '').toString()) : 1;
 
     this.validate();
   }
