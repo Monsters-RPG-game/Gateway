@@ -28,16 +28,17 @@ export default (): Router => {
         secure: getConfig().session.secured ? true : false,
         sameSite: getConfig().session.secured ? true : false,
       };
+      if (getConfig().tokens.domain) {
+        options.domain = getConfig().myDomain;
+      }
       const accessOptions: CookieOptions = {
         ...options,
         maxAge: ETTL.UserAccessToken * 1000,
-        domain: getConfig().myDomain,
       };
       const refreshOptions: CookieOptions = {
         ...options,
         maxAge: ETTL.UserRefreshToken * 1000,
         path: '/user/refresh',
-        domain: getConfig().myDomain,
       };
       const sessionOptions: CookieOptions = {
         ...options,

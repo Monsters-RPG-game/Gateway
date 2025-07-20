@@ -25,7 +25,7 @@ export default class RemoveAccountController implements IAbstractSubController<v
     if (!client) throw new InvalidRequest();
 
     const cookie = (req.cookies as Record<string, string>)[ETokens.Access];
-    Log.debug('Remove account', `User token ${cookie}`);
+    Log.log('Remove account', `User token ${cookie}`);
     if (!cookie) throw new InvalidRequest();
 
     const user = await TokensController.validateToken(cookie);

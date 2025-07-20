@@ -20,6 +20,7 @@ const preValidate = (config: types.IConfigInterface): void => {
     'socketPort',
     'redisURL',
     'session',
+    'tokens',
   ];
 
   configKeys.forEach((k) => {

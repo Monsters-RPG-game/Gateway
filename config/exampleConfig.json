@@ -17,5 +17,8 @@
   "metrics": {
     "loki": "loki address"
   },
-  "repository": "mongo"
+  "repository": "mongo",
+  "tokens": {
+    "domain": false
+  }
 }
