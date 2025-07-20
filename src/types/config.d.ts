@@ -18,4 +18,7 @@ export interface IConfigInterface {
     loki: string;
   };
   repository: string;
+  tokens: {
+    domain: boolean;
+  };
 }

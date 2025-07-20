@@ -28,8 +28,10 @@ export default (): Router => {
       const accessOptions: CookieOptions = {
         ...options,
         maxAge: ETTL.UserAccessToken * 1000,
-        domain: getConfig().myDomain,
       };
+      if (getConfig().tokens.domain) {
+        options.domain = getConfig().myDomain;
+      }
 
       if (typeof token === 'string') {
         res.cookie(ETokens.Access, token, accessOptions);
@@ -47,7 +49,6 @@ export default (): Router => {
         ...options,
         maxAge: ETTL.UserRefreshToken * 1000,
         path: '/user/refresh',
-        domain: getConfig().myDomain,
       };
       const sessionOptions: CookieOptions = {
         ...options,
