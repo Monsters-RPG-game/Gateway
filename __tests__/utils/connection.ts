@@ -16,11 +16,10 @@ export default class Utils {
   }
 
   async connect(): Promise<void> {
-    State.mongo = await new Mongo().create()
+    State.mongo = await Mongo.create()
     State.controllers.init()
     State.router.init()
     State.socket.init();
-    await State.mongo.init()
     await State.redis.init()
   }
 

@@ -1,6 +1,12 @@
 {
-  "amqpURL": "amqp://user:password@address:port",
-  "mongoURL": "mongodb://user:password@address:port",
+  "mongo": {
+    "url": "mongodb://user:password@mongodb:27017",
+    "db": "Gateway",
+    "testDb": "Gateway-test"
+  },
+  "amqp": {
+    "url": "amqp://user:password@address:port"
+  },
   "corsOrigin": ["frontendAddress"],
   "myAddress": "yourAddress",
   "myDomain": "domainUsedByYourApp",

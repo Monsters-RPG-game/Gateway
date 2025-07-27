@@ -143,9 +143,15 @@ TestConfig will be used, if you run your application on dev servers. This config
 Each config includes few elements:
 ```json
 {
-  "amqpURL": "rabbitUrl",
+  "mongo": {
+    "url": "mongodb://user:password@address:port",
+    "db": "database",
+    "testDb": "database-test"
+  },
+  "amqp": {
+    "url": "amqp://user:password@address:port"
+  },
   "redisURL": "redis://:password@adress:port",
-  "mongoURL": "mongodb://user:password@adress:port",
   "authorizationAddress": "http://localhost",
   "authorizationInnerAddress": "http://localhost",
   "myAddress": "http://localhost",
@@ -164,25 +170,17 @@ Each config includes few elements:
 }
 ```
 
-HttpPort is port, that application will use
-
-MyAddress is address, that will be used to host this application. Make sure to include port, if default won't be used
-
-CorsOrigin is list of website that will use this application. If you do not care about it, set ["*"]
-
-mongoURL is address for mongoDB
-
-authorizationAddress is address for authorization server, which should be utilized
-
-authorizationInnerAddress is address for authorizations server located in k8s/docker network. This is meant for production env. For any other, simply copy value from `authorizationAddress`
-
-redisURL is address for redis, which is used to cache data like user sessions and connection params
-
-myDomain is domain, that this application will work on. It should be prefixed with dot. This config is used to set cookies, for production for whole domain with subdomains. Either add some random domain in /etc/hosts, or comment all ( atm 2 ) occurrences.
-
-metrics is a config for open telemetry. Currently those json files include loki address, while .env file should include open telemetry address
-
-session is config for express-session.
+- HttpPort is port, that application will use
+- MyAddress is address, that will be used to host this application. Make sure to include port, if default won't be used
+- CorsOrigin is list of website that will use this application. If you do not care about it, set ["*"]
+- Mongo is object containing settings for mongoDb connections
+- Amqp is config for connecting with rabbitMQ
+- authorizationAddress is address for authorization server, which should be utilized
+- authorizationInnerAddress is address for authorizations server located in k8s/docker network. This is meant for production env. For any other, simply copy value from `authorizationAddress`
+- redisURL is address for redis, which is used to cache data like user sessions and connection params
+- myDomain is domain, that this application will work on. It should be prefixed with dot. This config is used to set cookies, for production for whole domain with subdomains. Either add some random domain in /etc/hosts, or comment all ( atm 2 ) occurrences.
+- metrics is a config for open telemetry. Currently those json files include loki address, while .env file should include open telemetry address
+- session is config for express-session.
 - Secret is secret, which should be used to generate cookies for session
 - Secured is boolean, which is true, sets secured cookies. This is used, because localhost will not set secured cookies in modern browsers
 - TrustProxy Is config, which will trust `X-Forwarded-For` cookie. Disabled it, unless your api is behind a load balancer like nginx

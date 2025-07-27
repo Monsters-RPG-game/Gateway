@@ -42,7 +42,7 @@ class RotateKeys {
   }
 
   private async rotateKeys(): Promise<void> {
-    this.mongo = await new Mongo().create();
+    this.mongo = await Mongo.create();
 
     const repo = KeysRepository.createInstance();
     const keys = await repo.getAll();

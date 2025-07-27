@@ -1,10 +1,16 @@
 export interface IConfigInterface {
-  amqpURL: string;
   authorizationAddress: string;
   authorizationInnerAddress: string;
   corsOrigin: string[];
   httpPort: number;
-  mongoURL: string;
+  amqp: {
+    url: string;
+  };
+  mongo: {
+    url: string;
+    db: string;
+    testDb: string;
+  };
   myAddress: string;
   myDomain: string;
   redisURL: string;

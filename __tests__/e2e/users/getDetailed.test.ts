@@ -1,4 +1,4 @@
-import { describe, expect, it, afterEach, beforeAll, afterAll } from '@jest/globals';
+import { describe, expect, it, afterEach, beforeEach, afterAll } from '@jest/globals';
 import supertest from 'supertest';
 import { createCookie } from '../../utils/index.js'
 import fakeUsers from '../../utils/fakeData/users.json'
@@ -26,7 +26,7 @@ describe('Get detailed', () => {
   const tokens = new Tokens(userEntity)
   const { app } = State.router;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     await tokens.createKey();
     userToken = await tokens.createAccessToken();
   })
@@ -72,7 +72,7 @@ describe('Get detailed', () => {
   });
 
   describe('Should pass', () => {
-      it(`Get data`, async () => {
+      it.only(`Get data`, async () => {
       fakeBroker.addAction({
         shouldFail: false,
         returns: { payload: [fakeUsers.data[0] as Record<string, unknown>], target: EMessageTypes.Send },

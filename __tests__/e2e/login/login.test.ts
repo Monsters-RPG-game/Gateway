@@ -1,4 +1,4 @@
-import { describe, expect, it, afterEach, afterAll, beforeAll, beforeEach } from '@jest/globals';
+import { describe, expect, it, afterEach, afterAll, beforeEach } from '@jest/globals';
 import { createCookie } from '../../utils/index.js'
 import { IFullError } from '../../../src/types/index.js';
 import supertest from 'supertest';
@@ -20,13 +20,10 @@ describe('Get profile - validate auth', () => {
   const tokens = new Tokens(userEntity)
   let userToken: string | null = null
 
-  beforeAll(async () => {
-    await tokens.createKey();
-    userToken = await tokens.createAccessToken();
-  })
-
   beforeEach(async () => {
     await tokens.initLoginParams(fakeBroker);
+    await tokens.createKey();
+    userToken = await tokens.createAccessToken();
   })
 
   afterEach(() => {

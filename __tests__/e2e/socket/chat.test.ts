@@ -22,6 +22,7 @@ describe('Socket - chat', () => {
   const fakeBroker = State.broker as FakeBroker;
   let server: WsProvider;
   let client: IClient;
+  let client2: IClient;
   const fakeUser = fakeUsers.data[0] as IUserEntity;
   const fakeUser2 = fakeUsers.data[1] as IUserEntity;
   let clientOptions: Record<string, unknown>;
@@ -55,6 +56,13 @@ describe('Socket - chat', () => {
   const tokens2 = new Tokens(fakeUser2)
 
   beforeAll(async () => {
+    // I should finally fix this package...
+    server = MocSocket.createWsClient((State.socket as FakeSocketServer).server);
+  })
+
+  beforeEach(async () => {
+    await tokens.initLoginParamsForWebsocket(fakeBroker)
+
     const keyId = await tokens.createKey()
     const loginToken1 = await tokens.createAccessToken()
     tokens2.addKey(keyId)
@@ -67,14 +75,10 @@ describe('Socket - chat', () => {
       headers: { Cookie: createCookie(enums.ETokens.Access, loginToken2 as string) },
     };
 
-    // I should finally fix this package...
-    server = MocSocket.createWsClient((State.socket as FakeSocketServer).server);
     client = server.createClient()
     await client.connect(clientOptions);
-  })
 
-  beforeEach(async () => {
-    await tokens.initLoginParamsForWebsocket(fakeBroker)
+    client2 = server.createClient()
   })
 
   afterEach(async () => {
@@ -110,12 +114,6 @@ describe('Socket - chat', () => {
   });
 
   describe('Should pass', () => {
-    let client2: IClient;
-
-    beforeAll(async () => (client2 = server.createClient()));
-
-    afterEach(async () => client2.disconnect());
-
     it(`No messages`, async () => {
       await client2.connect(client2Options);
       const data = await client2.sendAsyncMessage(message, { timeout: 100 });
@@ -124,6 +122,10 @@ describe('Socket - chat', () => {
     });
 
     it(`Get message from db`, async () => {
+      fakeBroker.addAction({
+        shouldFail: false,
+        returns: { payload: [fakeUser2 as IUserEntity & Record<string, unknown>], target: EMessageTypes.Send },
+      }, enums.EUserSubTargets.GetName)
       fakeBroker.addAction({
         shouldFail: false,
         returns: {
@@ -148,6 +150,10 @@ describe('Socket - chat', () => {
     });
 
     it(`Read chat`, async () => {
+      fakeBroker.addAction({
+        shouldFail: false,
+        returns: { payload: [fakeUser2 as IUserEntity & Record<string, unknown>], target: EMessageTypes.Send },
+      }, enums.EUserSubTargets.GetName)
       fakeBroker.addAction({
         shouldFail: false,
         returns: {
@@ -210,6 +216,10 @@ describe('Socket - chat', () => {
     });
 
     it(`Get with details`, async () => {
+      fakeBroker.addAction({
+        shouldFail: false,
+        returns: { payload: [fakeUser2 as IUserEntity & Record<string, unknown>], target: EMessageTypes.Send },
+      }, enums.EUserSubTargets.GetName)
       fakeBroker.addAction({
         shouldFail: false,
         returns: {

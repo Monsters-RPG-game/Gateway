@@ -1,6 +1,9 @@
 export enum EConfigKeys {
-  AMQP_URL = 'amqpURL',
-  MONGO_URL = 'mongoURL',
+  AMQP = 'amqp',
+  AMQP_URL = 'amqp.url',
+  MONGO_URL = 'mongo.url',
+  MONGO_DB = 'mongo.db',
+  MONGO_TEST_DB = 'mongo.testDb',
   CORS_ORIGIN = 'corsOrigin',
   MY_ADDRESS = 'myAddress',
   MY_DOMAIN = 'myDomain',
@@ -18,8 +21,11 @@ export enum EConfigKeys {
 }
 
 export enum EConfigEnvs {
+  AMQP = 'AMQP',
   AMQP_URL = 'AMQP_URL',
   MONGO_URL = 'MONGO_URL',
+  MONGO_DB = 'MONGO_DB',
+  MONGO_TEST_DB = 'MONGO_TEST_DB',
   CORS_ORIGIN = 'CORS_ORIGIN',
   MY_ADDRESS = 'MY_ADDRESS',
   MY_DOMAIN = 'MY_DOMAIN',
