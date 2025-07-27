@@ -129,7 +129,7 @@ export default class Broker {
     }
 
     try {
-      const connection = await amqplib.connect(ConfigLoader.getConfig().amqpURL);
+      const connection = await amqplib.connect(ConfigLoader.getConfig().amqp.url);
 
       Log.log('Rabbit', 'Connected to rabbit');
       this._connection = connection;

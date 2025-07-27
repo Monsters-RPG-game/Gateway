@@ -42,7 +42,6 @@ class App {
     const router = new Router();
     const broker = new Broker();
     const socket = new WebsocketServer();
-    const mongo = new Mongo();
     const redis = new Redis();
 
     State.controllers = controllers;
@@ -50,7 +49,7 @@ class App {
     State.broker = broker;
     State.socket = socket;
     State.redis = redis;
-    State.mongo = await mongo.create();
+    State.mongo = await Mongo.create();
 
     await redis.init();
 

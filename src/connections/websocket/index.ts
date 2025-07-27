@@ -220,6 +220,13 @@ export default class WebsocketServer {
           'Token validation',
           `User token is valid, but there is no user related to it. This SHOULD NOT have happen and this is CRITICAL error. User sub ${login}`,
         );
+        Log.debug(
+          `User token is valid, but there is no user related to it. This SHOULD NOT have happen and this is CRITICAL error. User sub ${login}`,
+          {
+            profile,
+            account,
+          },
+        );
         ws.close(
           1000,
           JSON.stringify({
