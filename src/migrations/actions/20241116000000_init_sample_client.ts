@@ -11,7 +11,7 @@ export default {
     await client.save();
 
     const oidcClient = new OidcClient({
-      clientId: 'oidcClient',
+      clientId: 'login',
       clientSecret: 'superSecretPassword',
       clientGrant: 'authorization_code,refresh_token',
       redirectUrl: 'http://127.0.0.1/login',
@@ -24,6 +24,6 @@ export default {
 
   async down(): Promise<void> {
     await Client.findOneAndDelete({ client_id: 'register' });
-    await OidcClient.findOneAndDelete({ clientId: 'oidcClient' });
+    await OidcClient.findOneAndDelete({ clientId: 'login' });
   },
 };

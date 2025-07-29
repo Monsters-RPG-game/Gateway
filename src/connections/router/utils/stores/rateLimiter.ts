@@ -16,7 +16,7 @@ export default class RateLimitStore implements Store {
    */
   @Log.decorateDebug('RateLimiter', 'Incrementing')
   async increment(key: string): Promise<IncrementResponse> {
-    const target = key === '::1' ? key : key.match(this.filter)![0];
+    const target = key.includes("::") ? key : key.match(this.filter)![0];
     return State.redis.setRateLimit(target);
   }
 
@@ -26,7 +26,7 @@ export default class RateLimitStore implements Store {
    */
   @Log.decorateDebug('RateLimiter', 'Resetting keys')
   async resetKey(key: string): Promise<void> {
-    const target = key === '::1' ? key : key.match(this.filter)![0];
+    const target = key.includes("::") ? key : key.match(this.filter)![0];
     await State.redis.removeRateLimit(target);
   }
 
@@ -36,7 +36,7 @@ export default class RateLimitStore implements Store {
    */
   @Log.decorateDebug('RateLimiter', 'Decrementing')
   async decrement(key: string): Promise<void> {
-    const target = key === '::1' ? key : key.match(this.filter)![0];
+    const target = key.includes("::") ? key : key.match(this.filter)![0];
     await State.redis.decrementRateLimit(target);
   }
 }
