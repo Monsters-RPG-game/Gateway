@@ -18,6 +18,7 @@ export default class Broker {
     [key in types.IAvailableServices]: { timeout: NodeJS.Timeout | null; retries: number; dead: boolean };
   } = {
     [enums.EServices.Users]: { timeout: null, retries: 0, dead: true },
+    [enums.EServices.Fights]: { timeout: null, retries: 0, dead: true },
     [enums.EServices.Messages]: { timeout: null, retries: 0, dead: true },
   };
   private readonly _controller: Controller;
@@ -28,6 +29,9 @@ export default class Broker {
     switch (target) {
       case enums.EServices.Users:
         await this.channel!.purgeQueue(enums.EAmqQueues.Users);
+        break;
+      case enums.EServices.Fights:
+        await this.channel!.purgeQueue(enums.EAmqQueues.Fights);
         break;
       case enums.EServices.Messages:
         await this.channel!.purgeQueue(enums.EAmqQueues.Messages);
