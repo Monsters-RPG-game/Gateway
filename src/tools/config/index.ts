@@ -82,13 +82,6 @@ export default class ConfigLoader {
   }
 
   /**
-   * Validate if config is correct.
-   */
-  static validateConfig(): void {
-    ConfigLoader.getConfig();
-  }
-
-  /**
    * Prepare config path.
    * @param target
    * @param fallback
